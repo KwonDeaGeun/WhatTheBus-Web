@@ -49,6 +49,10 @@
     --sidebar-ring: oklch(0.708 0 0);
 }
 
+body {
+  -webkit-overflow-scrolling: auto !important;
+}
+
 @theme inline {
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
