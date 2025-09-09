@@ -80,19 +80,27 @@ function App() {
 
         loadKakaoMapScript();
 
-        // 모바일 제스처/스크롤 제어
-        const gestureHandler = (e: Event) => e.preventDefault();
-        const touchMoveHandler = (e: TouchEvent) => {
-            if ((e.target as HTMLElement)?.closest && (e.target as HTMLElement).closest("#map")) {
-                e.stopPropagation();
+        // 모바일 제스처/스크롤 제어 (접근성 개선)
+        const container = document.getElementById("map");
+        const gestureHandler = (e: Event) => {
+            const t = e.target as HTMLElement | null;
+            if (t?.closest?.("#map") && e.cancelable) {
+                // 지도 영역 내에서만 핀치줌 방지
+                e.preventDefault();
             }
         };
-        document.addEventListener("gesturestart", gestureHandler);
-        document.addEventListener("touchmove", touchMoveHandler, { passive: false });
+        const touchMoveHandler = (e: TouchEvent) => {
+            // 지도 영역 내 터치 시 바디 스크롤 방지
+            if ((e.target as HTMLElement)?.closest?.("#map")) {
+                e.preventDefault();
+            }
+        };
+        document.addEventListener("gesturestart", gestureHandler, { passive: false });
+        container?.addEventListener("touchmove", touchMoveHandler, { passive: false });
 
         return () => {
             document.removeEventListener("gesturestart", gestureHandler);
-            document.removeEventListener("touchmove", touchMoveHandler);
+            container?.removeEventListener("touchmove", touchMoveHandler);
         };
     }, []);
 
