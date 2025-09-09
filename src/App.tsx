@@ -79,6 +79,21 @@ function App() {
         };
 
         loadKakaoMapScript();
+
+        // 모바일 제스처/스크롤 제어
+        const gestureHandler = (e: Event) => e.preventDefault();
+        const touchMoveHandler = (e: TouchEvent) => {
+            if ((e.target as HTMLElement)?.closest && (e.target as HTMLElement).closest("#map")) {
+                e.stopPropagation();
+            }
+        };
+        document.addEventListener("gesturestart", gestureHandler);
+        document.addEventListener("touchmove", touchMoveHandler, { passive: false });
+
+        return () => {
+            document.removeEventListener("gesturestart", gestureHandler);
+            document.removeEventListener("touchmove", touchMoveHandler);
+        };
     }, []);
 
     return (
