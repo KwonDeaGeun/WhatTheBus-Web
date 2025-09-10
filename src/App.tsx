@@ -3,6 +3,7 @@ import { useEffect } from "react";
 declare global {
     interface Window {
         kakao: any;
+        map?: any;
     }
 }
 
@@ -108,6 +109,21 @@ function App() {
         };
 
         loadKakaoMapScript();
+
+        // 외부 메시지로 지도 이동 지원
+        const messageHandler = (event: MessageEvent) => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.type === "MOVE" && window.map) {
+                    const { lat, lng } = data;
+                    const moveLatLon = new window.kakao.maps.LatLng(lat, lng);
+                    window.map.setCenter(moveLatLon);
+                }
+            } catch (e) {
+                console.error("Invalid message", e);
+            }
+        };
+        window.addEventListener("message", messageHandler);
 
         // 모바일 제스처/스크롤 제어 (접근성 개선)
         const container = document.getElementById("map");
