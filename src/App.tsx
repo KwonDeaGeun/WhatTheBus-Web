@@ -46,16 +46,42 @@ function App() {
                 level: 4,
             };
             const map = new window.kakao.maps.Map(container, options);
-            map.setZoomable(false); // 줌(축척) 고정
+            map.setMinLevel(3); // 최소 레벨(가장 많이 확대)
+            map.setMaxLevel(4); // 최대 레벨(가장 많이 축소)
+            map.setZoomable(true); // 줌 활성화
 
             // 정류장 정보 배열
             const busStops = [
-                { name: "단국대 평화의 광장", lat: 37.32014600082093, lng: 127.1288399333128 },
-                { name: "단국대 종합 실험동", lat: 37.32022368228002, lng: 127.12572906480165 },
-                { name: "단국대 치과병원", lat: 37.322291863336666, lng: 127.12543635052465 },
-                { name: "죽전역", lat: 37.32420554845601, lng: 127.10820542281134 },
-                { name: "단국대 정문", lat: 37.323352264049944, lng: 127.12596838722746 },
-                { name: "단국대 상경관", lat: 37.32220999341863, lng: 127.12826242041064 },
+                {
+                    name: "단국대 평화의 광장",
+                    lat: 37.32014600082093,
+                    lng: 127.1288399333128,
+                },
+                {
+                    name: "단국대 종합 실험동",
+                    lat: 37.32022368228002,
+                    lng: 127.12572906480165,
+                },
+                {
+                    name: "단국대 치과병원",
+                    lat: 37.322291863336666,
+                    lng: 127.12543635052465,
+                },
+                {
+                    name: "죽전역",
+                    lat: 37.32420554845601,
+                    lng: 127.10820542281134,
+                },
+                {
+                    name: "단국대 정문",
+                    lat: 37.323352264049944,
+                    lng: 127.12596838722746,
+                },
+                {
+                    name: "단국대 상경관",
+                    lat: 37.32220999341863,
+                    lng: 127.12826242041064,
+                },
             ];
 
             busStops.forEach((stop) => {
@@ -68,7 +94,10 @@ function App() {
                 busIconDiv.innerHTML =
                     '<img src="/ic_busstop.svg" alt="Bus Icon" width="40" height="40" />';
 
-                const markerPosition = new window.kakao.maps.LatLng(stop.lat, stop.lng);
+                const markerPosition = new window.kakao.maps.LatLng(
+                    stop.lat,
+                    stop.lng
+                );
                 const overlay = new window.kakao.maps.CustomOverlay({
                     position: markerPosition,
                     content: busIconDiv,
@@ -95,8 +124,12 @@ function App() {
                 e.preventDefault();
             }
         };
-        document.addEventListener("gesturestart", gestureHandler, { passive: false });
-        container?.addEventListener("touchmove", touchMoveHandler, { passive: false });
+        document.addEventListener("gesturestart", gestureHandler, {
+            passive: false,
+        });
+        container?.addEventListener("touchmove", touchMoveHandler, {
+            passive: false,
+        });
 
         return () => {
             document.removeEventListener("gesturestart", gestureHandler);
