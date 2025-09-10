@@ -44,9 +44,9 @@ function App() {
                     127.1288399333128
                 ),
                 level: 4,
-                minLevel: 3, // 최소 레벨(가장 많이 확대)
             };
             const map = new window.kakao.maps.Map(container, options);
+            map.setMinLevel(3); // 최소 레벨(가장 많이 확대)
             map.setMaxLevel(4); // 최대 레벨(가장 많이 축소)
             map.setZoomable(true); // 줌 활성화
 
