@@ -116,7 +116,12 @@ function App() {
         loadKakaoMapScript();
 
     const isRN = !!window.ReactNativeWebView;
-    const allowedOrigins = new Set([window.location.origin, "http://localhost:3000", "http://localhost:5173"]);
+    const selfOrigin = location.protocol.startsWith("http") ? location.origin : undefined;
+    const allowedOrigins = new Set([
+        ...(selfOrigin ? [selfOrigin] : []),
+        "http://localhost:3000",
+        "http://localhost:5173",
+    ]);
 
         const messageHandler = (event: MessageEvent) => {
             // RN(WebView)에서는 origin === "null" 허용
