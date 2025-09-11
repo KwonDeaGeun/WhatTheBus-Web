@@ -14,19 +14,29 @@ function App() {
         // try to read current center in a few common shapes
         const getCenterCoords = () => {
             try {
-                const c = (window.map as any).getCenter?.();
+                const c = window.map?.getCenter?.();
                 if (!c) return null;
                 if (
-                    typeof c.getLat === "function" &&
-                    typeof c.getLng === "function"
+                    "getLat" in c &&
+                    typeof (c as { getLat?: unknown }).getLat === "function"
                 ) {
-                    return { lat: c.getLat(), lng: c.getLng() };
+                    // Kakao LatLng-like object with getLat/getLng
+                    return {
+                        lat: (c as { getLat: () => number }).getLat(),
+                        lng: (c as { getLng: () => number }).getLng(),
+                    };
                 }
-                if (typeof c.lat === "number" && typeof c.lng === "number") {
-                    return { lat: c.lat, lng: c.lng };
+                if (
+                    "lat" in c &&
+                    typeof (c as { lat?: unknown }).lat === "number"
+                ) {
+                    return {
+                        lat: (c as { lat: number }).lat,
+                        lng: (c as { lng: number }).lng,
+                    };
                 }
             } catch {
-                // ignore
+                /* ignore */
             }
             return null;
         };
@@ -56,7 +66,9 @@ function App() {
         try {
             if (typeof window.__panAnimationId === "number")
                 cancelAnimationFrame(window.__panAnimationId);
-        } catch {}
+        } catch {
+            /* ignore */
+        }
 
         const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
 
@@ -71,7 +83,7 @@ function App() {
                     new window.kakao.maps.LatLng(curLat, curLng)
                 );
             } catch {
-                // ignore
+                /* ignore */
             }
 
             if (t < 1) {
@@ -79,7 +91,9 @@ function App() {
             } else {
                 try {
                     window.__panAnimationId = undefined;
-                } catch {}
+                } catch {
+                    /* ignore */
+                }
             }
         };
 
