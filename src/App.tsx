@@ -8,8 +8,13 @@ function App() {
     useEffect(() => {
         const kakaoApiKey = import.meta.env.VITE_KAKAO_MAP_API_KEY;
         const overlays: OverlayHandle[] = [];
+        
+        // Guard against multiple initMap executions in StrictMode
+        let mapInitialized = false;
 
         const initMap = () => {
+            if (mapInitialized) return;
+            mapInitialized = true;
             const container = document.getElementById(mapId);
             if (!container) {
                 console.error("지도를 표시할 HTML 요소를 찾을 수 없습니다.");
@@ -99,7 +104,26 @@ function App() {
                 return;
             }
 
-            const script = document.createElement("script");
+            const scriptId = 'kakao-maps-sdk';
+            let script = document.getElementById(scriptId) as HTMLScriptElement;
+            
+            if (script) {
+                // Script exists but may not be loaded yet
+                if (!window.kakao?.maps?.load) {
+                    // Attach handlers to existing script if not loaded
+                    script.onload = () => {
+                        window.kakao.maps.load(initMap);
+                    };
+                    script.onerror = () => {
+                        console.error("Kakao Maps API 스크립트를 로드하는데 실패했습니다.");
+                    };
+                }
+                return;
+            }
+
+            // Create new script with stable ID
+            script = document.createElement("script");
+            script.id = scriptId;
             script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoApiKey}&autoload=false`;
             script.async = true;
             document.head.appendChild(script);
