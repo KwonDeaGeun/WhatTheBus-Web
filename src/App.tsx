@@ -3,8 +3,11 @@ import { useEffect, useId } from "react";
 function App() {
     const mapId = useId();
 
+    type OverlayHandle = { setMap: (m: unknown) => void };
+
     useEffect(() => {
         const kakaoApiKey = import.meta.env.VITE_KAKAO_MAP_API_KEY;
+        const overlays: OverlayHandle[] = [];
 
         const initMap = () => {
             const container = document.getElementById(mapId);
@@ -86,6 +89,7 @@ function App() {
                 const markerPosition = new window.kakao.maps.LatLng(stop.lat, stop.lng);
                 const overlay = new window.kakao.maps.CustomOverlay({ position: markerPosition, content: busIconDiv, yAnchor: 1 });
                 overlay.setMap(map);
+                overlays.push(overlay as OverlayHandle);
             });
         };
 
@@ -111,10 +115,12 @@ function App() {
 
         loadKakaoMapScript();
 
-        const allowedOrigins = [window.location.origin, "http://localhost:3000", "http://localhost:5173"];
+    const isRN = !!window.ReactNativeWebView;
+    const allowedOrigins = new Set([window.location.origin, "http://localhost:3000", "http://localhost:5173"]);
 
         const messageHandler = (event: MessageEvent) => {
-            if (!allowedOrigins.includes(event.origin)) return;
+            // RN(WebView)에서는 origin === "null" 허용
+            if (!(isRN && event.origin === "null") && !allowedOrigins.has(event.origin)) return;
 
             let data: unknown;
             try {
@@ -154,6 +160,9 @@ function App() {
             document.removeEventListener("gesturestart", gestureHandler);
             containerEl?.removeEventListener("touchmove", touchMoveHandler);
             window.removeEventListener("message", messageHandler);
+            // 생성한 오버레이 해제
+            overlays.forEach((o) => { o.setMap(null); });
+            overlays.length = 0;
             window.map = undefined;
         };
     }, [mapId]);
