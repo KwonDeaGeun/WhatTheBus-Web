@@ -10,6 +10,9 @@ interface KakaoMap {
     setMinLevel: (level: number) => void;
     setMaxLevel: (level: number) => void;
     setZoomable: (zoomable: boolean) => void;
+    getCenter?: () =>
+        | KakaoLatLng
+        | { getLat: () => number; getLng: () => number };
 }
 
 interface KakaoOverlay {
@@ -34,6 +37,7 @@ declare global {
             };
         };
         map?: KakaoMap;
+        __panAnimationId?: number;
         // WebView / embed hooks used by React Native WebView or other hosts
         __moveFromRN?: (lat: number, lng: number) => void;
         __onMapReady?: () => void;
