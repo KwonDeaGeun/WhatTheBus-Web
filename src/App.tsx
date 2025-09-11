@@ -9,17 +9,16 @@ function App() {
         const initMap = () => {
             const container = document.getElementById(mapId);
             if (!container) {
-                // eslint-disable-next-line no-console
                 console.error("지도를 표시할 HTML 요소를 찾을 수 없습니다.");
                 return;
             }
 
             const options = {
-                center: new (window as any).kakao.maps.LatLng(37.32014600082093, 127.1288399333128),
+                center: new window.kakao.maps.LatLng(37.32014600082093, 127.1288399333128),
                 level: 4,
             };
 
-            const map = new (window as any).kakao.maps.Map(container, options);
+            const map = new window.kakao.maps.Map(container, options);
             map.setMinLevel(3);
             map.setMaxLevel(4);
             map.setZoomable(true);
@@ -35,7 +34,7 @@ function App() {
                         } else {
                             window.__pendingMove = { lat, lng };
                         }
-                    } catch (_err) {
+                    } catch {
                         // ignore
                     }
                 };
@@ -45,7 +44,7 @@ function App() {
                         try {
                             window.map?.setCenter(new window.kakao.maps.LatLng(window.__pendingMove.lat, window.__pendingMove.lng));
                             window.__pendingMove = null;
-                        } catch (_err) {
+                        } catch {
                             // ignore
                         }
                     }
@@ -53,7 +52,7 @@ function App() {
             if (typeof window.__onMapReady === "function") {
                 try {
                     window.__onMapReady();
-                } catch (_err) {
+                } catch {
                     // ignore
                 }
             }
@@ -61,7 +60,7 @@ function App() {
             if (window.ReactNativeWebView && typeof window.ReactNativeWebView.postMessage === "function") {
                 try {
                     window.ReactNativeWebView.postMessage(JSON.stringify({ type: "MAP_READY" }));
-                } catch (_err) {
+                } catch {
                     // ignore
                 }
             }
@@ -84,14 +83,14 @@ function App() {
                 busIconDiv.style.justifyContent = "center";
                 busIconDiv.innerHTML = '<img src="/ic_busstop.svg" alt="Bus Icon" width="40" height="40" />';
 
-                const markerPosition = new (window as any).kakao.maps.LatLng(stop.lat, stop.lng);
-                const overlay = new (window as any).kakao.maps.CustomOverlay({ position: markerPosition, content: busIconDiv, yAnchor: 1 });
+                const markerPosition = new window.kakao.maps.LatLng(stop.lat, stop.lng);
+                const overlay = new window.kakao.maps.CustomOverlay({ position: markerPosition, content: busIconDiv, yAnchor: 1 });
                 overlay.setMap(map);
             });
         };
 
         const loadKakaoMapScript = () => {
-            if ((window as any).kakao && (window as any).kakao.maps) {
+            if (window.kakao?.maps) {
                 initMap();
                 return;
             }
@@ -102,11 +101,10 @@ function App() {
             document.head.appendChild(script);
 
             script.onload = () => {
-                (window as any).kakao.maps.load(initMap);
+                window.kakao.maps.load(initMap);
             };
 
             script.onerror = () => {
-                // eslint-disable-next-line no-console
                 console.error("Kakao Maps API 스크립트를 로드하는데 실패했습니다.");
             };
         };
@@ -123,16 +121,16 @@ function App() {
                 if (typeof event.data === "object" && event.data !== null) data = event.data;
                 else if (typeof event.data === "string") data = JSON.parse(event.data);
                 else return;
-            } catch (_err) {
+            } catch {
                 return;
             }
 
             const payload = data as { type?: string; lat?: number; lng?: number };
-            if (payload.type === "MOVE" && window.map && Number.isFinite(payload.lat as number) && Number.isFinite(payload.lng as number)) {
+            if (payload.type === "MOVE" && window.map && typeof payload.lat === "number" && typeof payload.lng === "number" && Number.isFinite(payload.lat) && Number.isFinite(payload.lng)) {
                 try {
-                    const ll = new (window as any).kakao.maps.LatLng(payload.lat, payload.lng);
+                    const ll = new window.kakao.maps.LatLng(payload.lat, payload.lng);
                     window.map.setCenter(ll);
-                } catch (_err) {
+                } catch {
                     // ignore
                 }
             }
@@ -156,7 +154,6 @@ function App() {
             document.removeEventListener("gesturestart", gestureHandler);
             containerEl?.removeEventListener("touchmove", touchMoveHandler);
             window.removeEventListener("message", messageHandler);
-            // @ts-ignore
             window.map = undefined;
         };
     }, [mapId]);
