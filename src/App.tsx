@@ -156,7 +156,6 @@ function App() {
             // WebView message handling - only for non-MOVE commands if needed
             // Remove MOVE command handling - will use buttons instead
         };
-
         window.addEventListener("message", messageHandler);
 
         const containerEl = document.getElementById(mapId);
