@@ -1,11 +1,5 @@
 import { useEffect } from "react";
 
-declare global {
-    interface Window {
-        kakao: any;
-    }
-}
-
 function App() {
     useEffect(() => {
         const kakaoApiKey = import.meta.env.VITE_KAKAO_MAP_API_KEY;
@@ -49,6 +43,7 @@ function App() {
             map.setMinLevel(3); // 최소 레벨(가장 많이 확대)
             map.setMaxLevel(4); // 최대 레벨(가장 많이 축소)
             map.setZoomable(true); // 줌 활성화
+            window.map = map; // window.map에 할당
 
             // 정류장 정보 배열
             const busStops = [
@@ -109,6 +104,54 @@ function App() {
 
         loadKakaoMapScript();
 
+        // 외부 메시지로 지도 이동 지원 (보안 강화)
+        const allowedOrigins = [
+            window.location.origin,
+            "http://localhost:3000",
+            "http://localhost:5173",
+            // 필요한 경우 추가 도메인을 여기에 추가
+        ];
+
+        const messageHandler = (event: MessageEvent) => {
+            // Origin 검증
+            if (!allowedOrigins.includes(event.origin)) {
+                console.warn("Message from unauthorized origin:", event.origin);
+                return;
+            }
+
+            let data;
+            try {
+                // 이미 객체인 경우 JSON.parse 하지 않음
+                if (typeof event.data === "object" && event.data !== null) {
+                    data = event.data;
+                } else if (typeof event.data === "string") {
+                    data = JSON.parse(event.data);
+                } else {
+                    return; // 처리할 수 없는 데이터 타입
+                }
+            } catch (e) {
+                console.error("Invalid message format", e);
+                return;
+            }
+
+            // 데이터 검증
+            if (
+                data.type === "MOVE" &&
+                window.map &&
+                typeof data.lat === "number" &&
+                typeof data.lng === "number" &&
+                !isNaN(data.lat) &&
+                !isNaN(data.lng)
+            ) {
+                const moveLatLon = new window.kakao.maps.LatLng(
+                    data.lat,
+                    data.lng
+                );
+                window.map.setCenter(moveLatLon);
+            }
+        };
+        window.addEventListener("message", messageHandler);
+
         // 모바일 제스처/스크롤 제어 (접근성 개선)
         const container = document.getElementById("map");
         const gestureHandler = (e: Event) => {
@@ -134,6 +177,8 @@ function App() {
         return () => {
             document.removeEventListener("gesturestart", gestureHandler);
             container?.removeEventListener("touchmove", touchMoveHandler);
+            window.removeEventListener("message", messageHandler);
+            window.map = undefined; // 메모리 누수 방지
         };
     }, []);
 
