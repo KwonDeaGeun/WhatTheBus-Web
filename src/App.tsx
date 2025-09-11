@@ -1,82 +1,85 @@
-import { useEffect } from "react";
+import { useEffect, useId } from "react";
 
 function App() {
+    const mapId = useId();
+
+    type OverlayHandle = { setMap: (m: unknown) => void };
+
     useEffect(() => {
         const kakaoApiKey = import.meta.env.VITE_KAKAO_MAP_API_KEY;
-
-        const loadKakaoMapScript = () => {
-            if (window.kakao && window.kakao.maps) {
-                initMap();
-                return;
-            }
-
-            const script = document.createElement("script");
-            script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoApiKey}&autoload=false`;
-            script.async = true;
-            document.head.appendChild(script);
-
-            script.onload = () => {
-                window.kakao.maps.load(initMap);
-            };
-
-            script.onerror = () => {
-                console.error(
-                    "Kakao Maps API 스크립트를 로드하는데 실패했습니다."
-                );
-            };
-        };
+        const overlays: OverlayHandle[] = [];
+        
+        // Guard against multiple initMap executions in StrictMode
+        let mapInitialized = false;
 
         const initMap = () => {
-            const container = document.getElementById("map");
+            if (mapInitialized) return;
+            mapInitialized = true;
+            const container = document.getElementById(mapId);
             if (!container) {
                 console.error("지도를 표시할 HTML 요소를 찾을 수 없습니다.");
                 return;
             }
+
             const options = {
-                center: new window.kakao.maps.LatLng(
-                    37.32014600082093,
-                    127.1288399333128
-                ),
+                center: new window.kakao.maps.LatLng(37.32014600082093, 127.1288399333128),
                 level: 4,
             };
-            const map = new window.kakao.maps.Map(container, options);
-            map.setMinLevel(3); // 최소 레벨(가장 많이 확대)
-            map.setMaxLevel(4); // 최대 레벨(가장 많이 축소)
-            map.setZoomable(true); // 줌 활성화
-            window.map = map; // window.map에 할당
 
-            // 정류장 정보 배열
+            const map = new window.kakao.maps.Map(container, options);
+            map.setMinLevel(3);
+            map.setMaxLevel(4);
+            map.setZoomable(true);
+
+            window.map = map;
+
+            // WebView hooks
+            if (typeof window.__moveFromRN !== "function") {
+                window.__moveFromRN = (lat: number, lng: number) => {
+                    try {
+                        if (window.map && typeof window.map.setCenter === "function" && typeof window.kakao !== "undefined") {
+                            window.map.setCenter(new window.kakao.maps.LatLng(lat, lng));
+                        } else {
+                            window.__pendingMove = { lat, lng };
+                        }
+                    } catch {
+                        // ignore
+                    }
+                };
+            }
+
+                    if (window.__pendingMove && Number.isFinite(window.__pendingMove.lat) && Number.isFinite(window.__pendingMove.lng)) {
+                        try {
+                            window.map?.setCenter(new window.kakao.maps.LatLng(window.__pendingMove.lat, window.__pendingMove.lng));
+                            window.__pendingMove = null;
+                        } catch {
+                            // ignore
+                        }
+                    }
+
+            if (typeof window.__onMapReady === "function") {
+                try {
+                    window.__onMapReady();
+                } catch {
+                    // ignore
+                }
+            }
+
+            if (window.ReactNativeWebView && typeof window.ReactNativeWebView.postMessage === "function") {
+                try {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({ type: "MAP_READY" }));
+                } catch {
+                    // ignore
+                }
+            }
+
             const busStops = [
-                {
-                    name: "단국대 평화의 광장",
-                    lat: 37.32014600082093,
-                    lng: 127.1288399333128,
-                },
-                {
-                    name: "단국대 종합 실험동",
-                    lat: 37.32022368228002,
-                    lng: 127.12572906480165,
-                },
-                {
-                    name: "단국대 치과병원",
-                    lat: 37.322291863336666,
-                    lng: 127.12543635052465,
-                },
-                {
-                    name: "죽전역",
-                    lat: 37.32420554845601,
-                    lng: 127.10820542281134,
-                },
-                {
-                    name: "단국대 정문",
-                    lat: 37.323352264049944,
-                    lng: 127.12596838722746,
-                },
-                {
-                    name: "단국대 상경관",
-                    lat: 37.32220999341863,
-                    lng: 127.12826242041064,
-                },
+                { name: "단국대 평화의 광장", lat: 37.32014600082093, lng: 127.1288399333128 },
+                { name: "단국대 종합 실험동", lat: 37.32022368228002, lng: 127.12572906480165 },
+                { name: "단국대 치과병원", lat: 37.322291863336666, lng: 127.12543635052465 },
+                { name: "죽전역", lat: 37.32420554845601, lng: 127.10820542281134 },
+                { name: "단국대 정문", lat: 37.323352264049944, lng: 127.12596838722746 },
+                { name: "단국대 상경관", lat: 37.32220999341863, lng: 127.12826242041064 },
             ];
 
             busStops.forEach((stop) => {
@@ -86,105 +89,116 @@ function App() {
                 busIconDiv.style.display = "flex";
                 busIconDiv.style.alignItems = "center";
                 busIconDiv.style.justifyContent = "center";
-                busIconDiv.innerHTML =
-                    '<img src="/ic_busstop.svg" alt="Bus Icon" width="40" height="40" />';
+                busIconDiv.innerHTML = '<img src="/ic_busstop.svg" alt="Bus Icon" width="40" height="40" />';
 
-                const markerPosition = new window.kakao.maps.LatLng(
-                    stop.lat,
-                    stop.lng
-                );
-                const overlay = new window.kakao.maps.CustomOverlay({
-                    position: markerPosition,
-                    content: busIconDiv,
-                    yAnchor: 1,
-                });
+                const markerPosition = new window.kakao.maps.LatLng(stop.lat, stop.lng);
+                const overlay = new window.kakao.maps.CustomOverlay({ position: markerPosition, content: busIconDiv, yAnchor: 1 });
                 overlay.setMap(map);
+                overlays.push(overlay as OverlayHandle);
             });
+        };
+
+        const loadKakaoMapScript = () => {
+            if (window.kakao?.maps?.load) {
+                window.kakao.maps.load(initMap);
+                return;
+            }
+
+            const scriptId = 'kakao-maps-sdk';
+            let script = document.getElementById(scriptId) as HTMLScriptElement;
+            
+            if (script) {
+                // Script exists but may not be loaded yet
+                if (!window.kakao?.maps?.load) {
+                    // Attach handlers to existing script if not loaded
+                    script.onload = () => {
+                        window.kakao.maps.load(initMap);
+                    };
+                    script.onerror = () => {
+                        console.error("Kakao Maps API 스크립트를 로드하는데 실패했습니다.");
+                    };
+                }
+                return;
+            }
+
+            // Create new script with stable ID
+            script = document.createElement("script");
+            script.id = scriptId;
+            script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoApiKey}&autoload=false`;
+            script.async = true;
+            document.head.appendChild(script);
+
+            script.onload = () => {
+                window.kakao.maps.load(initMap);
+            };
+
+            script.onerror = () => {
+                console.error("Kakao Maps API 스크립트를 로드하는데 실패했습니다.");
+            };
         };
 
         loadKakaoMapScript();
 
-        // 외부 메시지로 지도 이동 지원 (보안 강화)
-        const allowedOrigins = [
-            window.location.origin,
-            "http://localhost:3000",
-            "http://localhost:5173",
-            // 필요한 경우 추가 도메인을 여기에 추가
-        ];
+    const isRN = !!window.ReactNativeWebView;
+    const selfOrigin = location.protocol.startsWith("http") ? location.origin : undefined;
+    const allowedOrigins = new Set([
+        ...(selfOrigin ? [selfOrigin] : []),
+        "http://localhost:3000",
+        "http://localhost:5173",
+    ]);
 
         const messageHandler = (event: MessageEvent) => {
-            // Origin 검증
-            if (!allowedOrigins.includes(event.origin)) {
-                console.warn("Message from unauthorized origin:", event.origin);
-                return;
-            }
+            // RN(WebView)에서는 origin === "null" 허용
+            if (!(isRN && event.origin === "null") && !allowedOrigins.has(event.origin)) return;
 
-            let data;
+            let data: unknown;
             try {
-                // 이미 객체인 경우 JSON.parse 하지 않음
-                if (typeof event.data === "object" && event.data !== null) {
-                    data = event.data;
-                } else if (typeof event.data === "string") {
-                    data = JSON.parse(event.data);
-                } else {
-                    return; // 처리할 수 없는 데이터 타입
-                }
-            } catch (e) {
-                console.error("Invalid message format", e);
+                if (typeof event.data === "object" && event.data !== null) data = event.data;
+                else if (typeof event.data === "string") data = JSON.parse(event.data);
+                else return;
+            } catch {
                 return;
             }
 
-            // 데이터 검증
-            if (
-                data.type === "MOVE" &&
-                window.map &&
-                typeof data.lat === "number" &&
-                typeof data.lng === "number" &&
-                !isNaN(data.lat) &&
-                !isNaN(data.lng)
-            ) {
-                const moveLatLon = new window.kakao.maps.LatLng(
-                    data.lat,
-                    data.lng
-                );
-                window.map.setCenter(moveLatLon);
+            const payload = data as { type?: string; lat?: number; lng?: number };
+            if (payload.type === "MOVE" && window.map && typeof payload.lat === "number" && typeof payload.lng === "number" && Number.isFinite(payload.lat) && Number.isFinite(payload.lng)) {
+                try {
+                    const ll = new window.kakao.maps.LatLng(payload.lat, payload.lng);
+                    window.map.setCenter(ll);
+                } catch {
+                    // ignore
+                }
             }
         };
+
         window.addEventListener("message", messageHandler);
 
-        // 모바일 제스처/스크롤 제어 (접근성 개선)
-        const container = document.getElementById("map");
+        const containerEl = document.getElementById(mapId);
         const gestureHandler = (e: Event) => {
             const t = e.target as HTMLElement | null;
-            if (t?.closest?.("#map") && e.cancelable) {
-                // 지도 영역 내에서만 핀치줌 방지
-                e.preventDefault();
-            }
+            if (containerEl && t && containerEl.contains(t) && e.cancelable) e.preventDefault();
         };
         const touchMoveHandler = (e: TouchEvent) => {
-            // 지도 영역 내 터치 시 바디 스크롤 방지
-            if ((e.target as HTMLElement)?.closest?.("#map")) {
-                e.preventDefault();
-            }
+            if (containerEl && e.target && containerEl.contains(e.target as Node)) e.preventDefault();
         };
-        document.addEventListener("gesturestart", gestureHandler, {
-            passive: false,
-        });
-        container?.addEventListener("touchmove", touchMoveHandler, {
-            passive: false,
-        });
+
+        document.addEventListener("gesturestart", gestureHandler, { passive: false });
+        containerEl?.addEventListener("touchmove", touchMoveHandler, { passive: false });
 
         return () => {
             document.removeEventListener("gesturestart", gestureHandler);
-            container?.removeEventListener("touchmove", touchMoveHandler);
+            containerEl?.removeEventListener("touchmove", touchMoveHandler);
             window.removeEventListener("message", messageHandler);
-            window.map = undefined; // 메모리 누수 방지
+            // 생성한 오버레이 해제
+            overlays.forEach((o) => { o.setMap(null); });
+            overlays.length = 0;
+            window.map = undefined;
         };
-    }, []);
+    }, [mapId]);
 
     return (
         <div className="App">
-            <div id="map" style={{ width: "100vw", height: "100vh" }} />
+            <div id={mapId} style={{ width: "100vw", height: "100vh" }} />
         </div>
     );
 }
