@@ -47,12 +47,13 @@ export default function BusStops({
                         if (next) setOpenNumbers(false);
                     }}
                     style={{
-                        width: 48,
-                        height: 48,
-                        padding: 0,
-                        border: "none",
-                        background: "transparent",
-                        cursor: "pointer",
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '8px 12px',
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
                     }}
                 >
                     <img
@@ -61,17 +62,18 @@ export default function BusStops({
                         width={48}
                         height={48}
                     />
+                    <span style={{ color: '#333', fontSize: 14, display: openStops ? 'none' : 'inline' }}>버스 정류장 선택하기</span>
                 </button>
-                <span style={{ marginLeft: 8, color: '#333', fontSize: 14, display: openStops ? 'none' : 'inline' }}>버스 정류장 선택하기</span>
 
                 <section
                     id={listId}
                     aria-label="버스 정류장 목록"
                     style={{
-                        display: openStops ? "flex" : "none",
-                        flexWrap: "wrap",
+                        display: openStops ? "grid" : "none",
+                        gridTemplateColumns: "repeat(2, 1fr)",
                         gap: "8px",
-                        marginLeft: 12,
+                        width: '100%',
+                        marginTop: 8,
                     }}
                 >
                     {busStops.map((stop) => (
@@ -111,12 +113,13 @@ export default function BusStops({
                         if (next) setOpenStops(false);
                     }}
                     style={{
-                        width: 48,
-                        height: 48,
-                        padding: 0,
-                        border: "none",
-                        background: "transparent",
-                        cursor: "pointer",
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '8px 12px',
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
                     }}
                 >
                     <img
@@ -125,16 +128,18 @@ export default function BusStops({
                         width={48}
                         height={48}
                     />
+                    <span style={{ color: '#333', fontSize: 14, display: openNumbers ? 'none' : 'inline' }}>버스 선택하기</span>
                 </button>
-                <span style={{ marginLeft: 8, color: '#333', fontSize: 14, display: openNumbers ? 'none' : 'inline' }}>버스 선택하기</span>
 
                 <section
                     id={numbersId}
                     aria-label="버스 번호 선택"
                     style={{
-                        display: openNumbers ? "flex" : "none",
+                        display: openNumbers ? "grid" : "none",
+                        gridTemplateColumns: "repeat(2, 1fr)",
                         gap: "8px",
-                        marginLeft: 12,
+                        width: '100%',
+                        marginTop: 8,
                         alignItems: "center",
                     }}
                 >
