@@ -21,7 +21,6 @@ export default function BusStops({
         if (onBusNumberSelect) onBusNumberSelect(n);
         // eslint-disable-next-line no-console
         console.log(`Selected bus number: ${n}`);
-    setOpenNumbers(false);
     };
 
     return (
