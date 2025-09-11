@@ -84,26 +84,39 @@ export default function BusStops({
                         marginTop: 8,
                     }}
                 >
-                    {busStops.map((stop) => (
-                        <button
-                            key={stop.name}
-                            type="button"
-                            onClick={() => {
-                                onSelect(stop);
-                            }}
-                            style={{
-                                padding: "8px 12px",
-                                backgroundColor: "#007bff",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "4px",
-                                cursor: "pointer",
-                                fontSize: "14px",
-                            }}
-                        >
-                            {stop.name}
-                        </button>
-                    ))}
+                    {/* Only show two buttons: 단국대학교 and 죽전역 */}
+                    {[{ name: "단국대학교" }, { name: "죽전역" }].map(
+                        (stop) => (
+                            <button
+                                key={stop.name}
+                                type="button"
+                                onClick={() => {
+                                    // Find the actual stop object from busStops
+                                    const realStop = busStops.find(
+                                        (s) =>
+                                            (stop.name === "단국대학교" &&
+                                                (s.name === "치과병원" ||
+                                                    s.name === "단국대학교")) ||
+                                            s.name === stop.name
+                                    );
+                                    if (realStop) onSelect(realStop);
+                                }}
+                                style={{
+                                    padding: "16px 12px",
+                                    minHeight: "48px",
+                                    backgroundColor: "#007bff",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "4px",
+                                    cursor: "pointer",
+                                    fontSize: "16px",
+                                    fontWeight: "bold",
+                                }}
+                            >
+                                {stop.name}
+                            </button>
+                        )
+                    )}
                 </section>
             </div>
 
@@ -165,13 +178,15 @@ export default function BusStops({
                             type="button"
                             onClick={() => handleNumberClick(n)}
                             style={{
-                                padding: "8px 12px",
+                                padding: "16px 12px",
+                                minHeight: "48px",
                                 backgroundColor: "#007bff",
                                 color: "white",
                                 border: "none",
                                 borderRadius: "4px",
                                 cursor: "pointer",
-                                fontSize: "14px",
+                                fontSize: "16px",
+                                fontWeight: "bold",
                                 transition: "background-color 0.15s ease",
                             }}
                             onPointerEnter={(e) => {
