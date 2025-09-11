@@ -7,12 +7,83 @@ function App() {
 
     type OverlayHandle = { setMap: (m: unknown) => void };
 
-    // Function to move map to specific location
+    // Function to move map to specific location with smooth animation
     const moveToLocation = (lat: number, lng: number) => {
-        if (window.map) {
-            const location = new window.kakao.maps.LatLng(lat, lng);
-            window.map.setCenter(location);
+        if (!window.map || typeof window.kakao === "undefined") return;
+
+        // try to read current center in a few common shapes
+        const getCenterCoords = () => {
+            try {
+                const c = (window.map as any).getCenter?.();
+                if (!c) return null;
+                if (
+                    typeof c.getLat === "function" &&
+                    typeof c.getLng === "function"
+                ) {
+                    return { lat: c.getLat(), lng: c.getLng() };
+                }
+                if (typeof c.lat === "number" && typeof c.lng === "number") {
+                    return { lat: c.lat, lng: c.lng };
+                }
+            } catch {
+                // ignore
+            }
+            return null;
+        };
+
+        const start = getCenterCoords();
+        const targetLat = Number(lat);
+        const targetLng = Number(lng);
+
+        // if we can't read start center, jump immediately
+        if (!start) {
+            try {
+                window.map?.setCenter(
+                    new window.kakao.maps.LatLng(targetLat, targetLng)
+                );
+            } catch {
+                // ignore
+            }
+            return;
         }
+
+        const duration = 500; // ms
+        const startTime = performance.now();
+        const startLat = start.lat;
+        const startLng = start.lng;
+
+        // cancel previous animation if any
+        try {
+            if (typeof window.__panAnimationId === "number")
+                cancelAnimationFrame(window.__panAnimationId);
+        } catch {}
+
+        const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
+
+        const step = (now: number) => {
+            const elapsed = now - startTime;
+            const t = Math.min(1, Math.max(0, elapsed / duration));
+            const eased = easeOutCubic(t);
+            const curLat = startLat + (targetLat - startLat) * eased;
+            const curLng = startLng + (targetLng - startLng) * eased;
+            try {
+                window.map?.setCenter(
+                    new window.kakao.maps.LatLng(curLat, curLng)
+                );
+            } catch {
+                // ignore
+            }
+
+            if (t < 1) {
+                window.__panAnimationId = requestAnimationFrame(step);
+            } else {
+                try {
+                    window.__panAnimationId = undefined;
+                } catch {}
+            }
+        };
+
+        window.__panAnimationId = requestAnimationFrame(step);
     };
 
     useEffect(() => {
