@@ -183,7 +183,7 @@ function App() {
 
     return (
         <div className="App" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-            <div id={mapId} style={{ height: '60vh', width: "100vw" }} />
+            <div id={mapId} style={{ height: '50vh', width: "100vw" }} />
             <div style={{ 
                 padding: '10px', 
                 display: 'flex', 
