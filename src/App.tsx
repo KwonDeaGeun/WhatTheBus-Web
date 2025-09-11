@@ -90,13 +90,13 @@ function App() {
         };
 
         const loadKakaoMapScript = () => {
-            if (window.kakao?.maps) {
-                initMap();
+            if (window.kakao?.maps?.load) {
+                window.kakao.maps.load(initMap);
                 return;
             }
 
             const script = document.createElement("script");
-            script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoApiKey}&autoload=false`;
+            script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoApiKey}&autoload=false`;
             script.async = true;
             document.head.appendChild(script);
 
@@ -141,10 +141,10 @@ function App() {
         const containerEl = document.getElementById(mapId);
         const gestureHandler = (e: Event) => {
             const t = e.target as HTMLElement | null;
-            if (t?.closest?.("#" + mapId) && e.cancelable) e.preventDefault();
+            if (containerEl && t && containerEl.contains(t) && e.cancelable) e.preventDefault();
         };
         const touchMoveHandler = (e: TouchEvent) => {
-            if ((e.target as HTMLElement)?.closest?.("#" + mapId)) e.preventDefault();
+            if (containerEl && e.target && containerEl.contains(e.target as Node)) e.preventDefault();
         };
 
         document.addEventListener("gesturestart", gestureHandler, { passive: false });
