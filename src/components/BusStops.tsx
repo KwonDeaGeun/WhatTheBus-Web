@@ -21,6 +21,7 @@ export default function BusStops({
         if (onBusNumberSelect) onBusNumberSelect(n);
         // eslint-disable-next-line no-console
         console.log(`Selected bus number: ${n}`);
+    setOpenNumbers(false);
     };
 
     return (
@@ -37,6 +38,7 @@ export default function BusStops({
                 style={{ display: "flex", alignItems: "center", width: "100%" }}
             >
                 <button
+                    aria-label="버스 정류장 목록 토글"
                     type="button"
                     aria-expanded={openStops}
                     aria-controls={listId}
@@ -99,6 +101,7 @@ export default function BusStops({
                 style={{ display: "flex", alignItems: "center", width: "100%" }}
             >
                 <button
+                    aria-label="버스 번호 선택 토글"
                     type="button"
                     aria-expanded={openNumbers}
                     aria-controls={numbersId}
@@ -147,22 +150,13 @@ export default function BusStops({
                                 borderRadius: "4px",
                                 cursor: "pointer",
                                 fontSize: "14px",
+                                transition: "background-color 0.15s ease",
                             }}
-                            onMouseOver={(e) => {
-                                e.currentTarget.style.backgroundColor =
-                                    "#0056b3";
+                            onPointerEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = "#0056b3";
                             }}
-                            onMouseOut={(e) => {
-                                e.currentTarget.style.backgroundColor =
-                                    "#007bff";
-                            }}
-                            onFocus={(e) => {
-                                e.currentTarget.style.backgroundColor =
-                                    "#0056b3";
-                            }}
-                            onBlur={(e) => {
-                                e.currentTarget.style.backgroundColor =
-                                    "#007bff";
+                            onPointerLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = "#007bff";
                             }}
                         >
                             {n}

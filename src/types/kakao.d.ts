@@ -21,8 +21,15 @@ declare global {
         kakao: {
             maps: {
                 LatLng: new (lat: number, lng: number) => KakaoLatLng;
-                Map: new (container: HTMLElement, options: unknown) => KakaoMap;
-                CustomOverlay: new (options: unknown) => KakaoOverlay;
+                Map: new (
+                    container: HTMLElement,
+                    options: { center: KakaoLatLng; level?: number }
+                ) => KakaoMap;
+                CustomOverlay: new (options: {
+                    position: KakaoLatLng;
+                    content: HTMLElement | string;
+                    yAnchor?: number;
+                }) => KakaoOverlay;
                 load: (callback: () => void) => void;
             };
         };
