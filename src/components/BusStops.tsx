@@ -47,13 +47,13 @@ export default function BusStops({
                         if (next) setOpenNumbers(false);
                     }}
                     style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
+                        display: "inline-flex",
+                        alignItems: "center",
                         gap: 8,
-                        padding: '8px 12px',
-                        border: 'none',
-                        background: 'transparent',
-                        cursor: 'pointer',
+                        padding: "8px 12px",
+                        border: "none",
+                        background: "transparent",
+                        cursor: "pointer",
                     }}
                 >
                     <img
@@ -62,7 +62,15 @@ export default function BusStops({
                         width={48}
                         height={48}
                     />
-                    <span style={{ color: '#333', fontSize: 14, display: openStops ? 'none' : 'inline' }}>버스 정류장 선택하기</span>
+                    <span
+                        style={{
+                            color: "#333",
+                            fontSize: 14,
+                            display: openStops ? "none" : "inline",
+                        }}
+                    >
+                        버스 정류장 선택하기
+                    </span>
                 </button>
 
                 <section
@@ -72,7 +80,7 @@ export default function BusStops({
                         display: openStops ? "grid" : "none",
                         gridTemplateColumns: "repeat(2, 1fr)",
                         gap: "8px",
-                        width: '100%',
+                        width: "100%",
                         marginTop: 8,
                     }}
                 >
@@ -113,13 +121,13 @@ export default function BusStops({
                         if (next) setOpenStops(false);
                     }}
                     style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
+                        display: "inline-flex",
+                        alignItems: "center",
                         gap: 8,
-                        padding: '8px 12px',
-                        border: 'none',
-                        background: 'transparent',
-                        cursor: 'pointer',
+                        padding: "8px 12px",
+                        border: "none",
+                        background: "transparent",
+                        cursor: "pointer",
                     }}
                 >
                     <img
@@ -128,7 +136,15 @@ export default function BusStops({
                         width={48}
                         height={48}
                     />
-                    <span style={{ color: '#333', fontSize: 14, display: openNumbers ? 'none' : 'inline' }}>버스 선택하기</span>
+                    <span
+                        style={{
+                            color: "#333",
+                            fontSize: 14,
+                            display: openNumbers ? "none" : "inline",
+                        }}
+                    >
+                        버스 선택하기
+                    </span>
                 </button>
 
                 <section
@@ -138,7 +154,7 @@ export default function BusStops({
                         display: openNumbers ? "grid" : "none",
                         gridTemplateColumns: "repeat(2, 1fr)",
                         gap: "8px",
-                        width: '100%',
+                        width: "100%",
                         marginTop: 8,
                         alignItems: "center",
                     }}
@@ -159,10 +175,12 @@ export default function BusStops({
                                 transition: "background-color 0.15s ease",
                             }}
                             onPointerEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = "#0056b3";
+                                e.currentTarget.style.backgroundColor =
+                                    "#0056b3";
                             }}
                             onPointerLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = "#007bff";
+                                e.currentTarget.style.backgroundColor =
+                                    "#007bff";
                             }}
                         >
                             {n}
