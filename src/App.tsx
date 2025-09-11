@@ -1,9 +1,20 @@
 import { useEffect, useId } from "react";
+import { busStops } from "./data/busStops";
+import BusStops from "./components/BusStops";
 
 function App() {
     const mapId = useId();
+    
 
     type OverlayHandle = { setMap: (m: unknown) => void };
+
+    // Function to move map to specific location
+    const moveToLocation = (lat: number, lng: number) => {
+        if (window.map) {
+            const location = new window.kakao.maps.LatLng(lat, lng);
+            window.map.setCenter(location);
+        }
+    };
 
     useEffect(() => {
         const kakaoApiKey = import.meta.env.VITE_KAKAO_MAP_API_KEY;
@@ -73,23 +84,14 @@ function App() {
                 }
             }
 
-            const busStops = [
-                { name: "단국대 평화의 광장", lat: 37.32014600082093, lng: 127.1288399333128 },
-                { name: "단국대 종합 실험동", lat: 37.32022368228002, lng: 127.12572906480165 },
-                { name: "단국대 치과병원", lat: 37.322291863336666, lng: 127.12543635052465 },
-                { name: "죽전역", lat: 37.32420554845601, lng: 127.10820542281134 },
-                { name: "단국대 정문", lat: 37.323352264049944, lng: 127.12596838722746 },
-                { name: "단국대 상경관", lat: 37.32220999341863, lng: 127.12826242041064 },
-            ];
-
             busStops.forEach((stop) => {
                 const busIconDiv = document.createElement("div");
-                busIconDiv.style.width = "40px";
-                busIconDiv.style.height = "40px";
+                busIconDiv.style.width = "48px";
+                busIconDiv.style.height = "48px";
                 busIconDiv.style.display = "flex";
                 busIconDiv.style.alignItems = "center";
                 busIconDiv.style.justifyContent = "center";
-                busIconDiv.innerHTML = '<img src="/ic_busstop.svg" alt="Bus Icon" width="40" height="40" />';
+                busIconDiv.innerHTML = '<img src="/ic_busstop.svg" alt="Bus Icon" width="48" height="48" />';
 
                 const markerPosition = new window.kakao.maps.LatLng(stop.lat, stop.lng);
                 const overlay = new window.kakao.maps.CustomOverlay({ position: markerPosition, content: busIconDiv, yAnchor: 1 });
@@ -148,29 +150,12 @@ function App() {
     ]);
 
         const messageHandler = (event: MessageEvent) => {
-            // RN(WebView)에서는 origin === "null" 허용
+            // RN(WebView)에서만 origin === "null" 허용
             if (!(isRN && event.origin === "null") && !allowedOrigins.has(event.origin)) return;
 
-            let data: unknown;
-            try {
-                if (typeof event.data === "object" && event.data !== null) data = event.data;
-                else if (typeof event.data === "string") data = JSON.parse(event.data);
-                else return;
-            } catch {
-                return;
-            }
-
-            const payload = data as { type?: string; lat?: number; lng?: number };
-            if (payload.type === "MOVE" && window.map && typeof payload.lat === "number" && typeof payload.lng === "number" && Number.isFinite(payload.lat) && Number.isFinite(payload.lng)) {
-                try {
-                    const ll = new window.kakao.maps.LatLng(payload.lat, payload.lng);
-                    window.map.setCenter(ll);
-                } catch {
-                    // ignore
-                }
-            }
+            // WebView message handling - only for non-MOVE commands if needed
+            // Remove MOVE command handling - will use buttons instead
         };
-
         window.addEventListener("message", messageHandler);
 
         const containerEl = document.getElementById(mapId);
@@ -197,8 +182,21 @@ function App() {
     }, [mapId]);
 
     return (
-        <div className="App">
-            <div id={mapId} style={{ width: "100vw", height: "100vh" }} />
+        <div className="App" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+            <div id={mapId} style={{ height: '60vh', width: "100vw" }} />
+            <div style={{ 
+                padding: '10px', 
+                display: 'flex', 
+                alignItems: 'center',
+                gap: '8px', 
+                backgroundColor: '#f5f5f5',
+                borderTop: '1px solid #ddd'
+            }}>
+                <BusStops
+                    busStops={busStops}
+                    onSelect={(stop) => moveToLocation(stop.lat, stop.lng)}
+                />
+            </div>
         </div>
     );
 }
