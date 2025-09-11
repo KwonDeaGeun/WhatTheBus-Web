@@ -62,6 +62,7 @@ export default function BusStops({
                         height={48}
                     />
                 </button>
+                <span style={{ marginLeft: 8, color: '#333', fontSize: 14, display: openStops ? 'none' : 'inline' }}>버스 정류장 선택하기</span>
 
                 <section
                     id={listId}
@@ -125,6 +126,7 @@ export default function BusStops({
                         height={48}
                     />
                 </button>
+                <span style={{ marginLeft: 8, color: '#333', fontSize: 14, display: openNumbers ? 'none' : 'inline' }}>버스 선택하기</span>
 
                 <section
                     id={numbersId}
