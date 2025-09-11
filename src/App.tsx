@@ -107,24 +107,24 @@ function App() {
         // 외부 메시지로 지도 이동 지원 (보안 강화)
         const allowedOrigins = [
             window.location.origin,
-            'http://localhost:3000',
-            'http://localhost:5173',
+            "http://localhost:3000",
+            "http://localhost:5173",
             // 필요한 경우 추가 도메인을 여기에 추가
         ];
-        
+
         const messageHandler = (event: MessageEvent) => {
             // Origin 검증
             if (!allowedOrigins.includes(event.origin)) {
-                console.warn('Message from unauthorized origin:', event.origin);
+                console.warn("Message from unauthorized origin:", event.origin);
                 return;
             }
 
             let data;
             try {
                 // 이미 객체인 경우 JSON.parse 하지 않음
-                if (typeof event.data === 'object' && event.data !== null) {
+                if (typeof event.data === "object" && event.data !== null) {
                     data = event.data;
-                } else if (typeof event.data === 'string') {
+                } else if (typeof event.data === "string") {
                     data = JSON.parse(event.data);
                 } else {
                     return; // 처리할 수 없는 데이터 타입
@@ -136,14 +136,17 @@ function App() {
 
             // 데이터 검증
             if (
-                data.type === "MOVE" && 
-                window.map && 
-                typeof data.lat === 'number' && 
-                typeof data.lng === 'number' &&
-                !isNaN(data.lat) && 
+                data.type === "MOVE" &&
+                window.map &&
+                typeof data.lat === "number" &&
+                typeof data.lng === "number" &&
+                !isNaN(data.lat) &&
                 !isNaN(data.lng)
             ) {
-                const moveLatLon = new window.kakao.maps.LatLng(data.lat, data.lng);
+                const moveLatLon = new window.kakao.maps.LatLng(
+                    data.lat,
+                    data.lng
+                );
                 window.map.setCenter(moveLatLon);
             }
         };
