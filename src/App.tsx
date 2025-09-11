@@ -1,10 +1,9 @@
 import { useEffect, useId } from "react";
-import { busStops } from "./data/busStops";
 import BusStops from "./components/BusStops";
+import { busStops } from "./data/busStops";
 
 function App() {
     const mapId = useId();
-    
 
     type OverlayHandle = { setMap: (m: unknown) => void };
 
@@ -19,7 +18,7 @@ function App() {
     useEffect(() => {
         const kakaoApiKey = import.meta.env.VITE_KAKAO_MAP_API_KEY;
         const overlays: OverlayHandle[] = [];
-        
+
         // Guard against multiple initMap executions in StrictMode
         let mapInitialized = false;
 
@@ -33,7 +32,10 @@ function App() {
             }
 
             const options = {
-                center: new window.kakao.maps.LatLng(37.32014600082093, 127.1288399333128),
+                center: new window.kakao.maps.LatLng(
+                    37.32014600082093,
+                    127.1288399333128
+                ),
                 level: 4,
             };
 
@@ -48,8 +50,14 @@ function App() {
             if (typeof window.__moveFromRN !== "function") {
                 window.__moveFromRN = (lat: number, lng: number) => {
                     try {
-                        if (window.map && typeof window.map.setCenter === "function" && typeof window.kakao !== "undefined") {
-                            window.map.setCenter(new window.kakao.maps.LatLng(lat, lng));
+                        if (
+                            window.map &&
+                            typeof window.map.setCenter === "function" &&
+                            typeof window.kakao !== "undefined"
+                        ) {
+                            window.map.setCenter(
+                                new window.kakao.maps.LatLng(lat, lng)
+                            );
                         } else {
                             window.__pendingMove = { lat, lng };
                         }
@@ -59,14 +67,23 @@ function App() {
                 };
             }
 
-                    if (window.__pendingMove && Number.isFinite(window.__pendingMove.lat) && Number.isFinite(window.__pendingMove.lng)) {
-                        try {
-                            window.map?.setCenter(new window.kakao.maps.LatLng(window.__pendingMove.lat, window.__pendingMove.lng));
-                            window.__pendingMove = null;
-                        } catch {
-                            // ignore
-                        }
-                    }
+            if (
+                window.__pendingMove &&
+                Number.isFinite(window.__pendingMove.lat) &&
+                Number.isFinite(window.__pendingMove.lng)
+            ) {
+                try {
+                    window.map?.setCenter(
+                        new window.kakao.maps.LatLng(
+                            window.__pendingMove.lat,
+                            window.__pendingMove.lng
+                        )
+                    );
+                    window.__pendingMove = null;
+                } catch {
+                    // ignore
+                }
+            }
 
             if (typeof window.__onMapReady === "function") {
                 try {
@@ -76,9 +93,14 @@ function App() {
                 }
             }
 
-            if (window.ReactNativeWebView && typeof window.ReactNativeWebView.postMessage === "function") {
+            if (
+                window.ReactNativeWebView &&
+                typeof window.ReactNativeWebView.postMessage === "function"
+            ) {
                 try {
-                    window.ReactNativeWebView.postMessage(JSON.stringify({ type: "MAP_READY" }));
+                    window.ReactNativeWebView.postMessage(
+                        JSON.stringify({ type: "MAP_READY" })
+                    );
                 } catch {
                     // ignore
                 }
@@ -91,10 +113,18 @@ function App() {
                 busIconDiv.style.display = "flex";
                 busIconDiv.style.alignItems = "center";
                 busIconDiv.style.justifyContent = "center";
-                busIconDiv.innerHTML = '<img src="/ic_busstop.svg" alt="Bus Icon" width="48" height="48" />';
+                busIconDiv.innerHTML =
+                    '<img src="/ic_busstop.svg" alt="Bus Icon" width="48" height="48" />';
 
-                const markerPosition = new window.kakao.maps.LatLng(stop.lat, stop.lng);
-                const overlay = new window.kakao.maps.CustomOverlay({ position: markerPosition, content: busIconDiv, yAnchor: 1 });
+                const markerPosition = new window.kakao.maps.LatLng(
+                    stop.lat,
+                    stop.lng
+                );
+                const overlay = new window.kakao.maps.CustomOverlay({
+                    position: markerPosition,
+                    content: busIconDiv,
+                    yAnchor: 1,
+                });
                 overlay.setMap(map);
                 overlays.push(overlay as OverlayHandle);
             });
@@ -106,9 +136,9 @@ function App() {
                 return;
             }
 
-            const scriptId = 'kakao-maps-sdk';
+            const scriptId = "kakao-maps-sdk";
             let script = document.getElementById(scriptId) as HTMLScriptElement;
-            
+
             if (script) {
                 // Script exists but may not be loaded yet
                 if (!window.kakao?.maps?.load) {
@@ -117,7 +147,9 @@ function App() {
                         window.kakao.maps.load(initMap);
                     };
                     script.onerror = () => {
-                        console.error("Kakao Maps API 스크립트를 로드하는데 실패했습니다.");
+                        console.error(
+                            "Kakao Maps API 스크립트를 로드하는데 실패했습니다."
+                        );
                     };
                 }
                 return;
@@ -135,23 +167,31 @@ function App() {
             };
 
             script.onerror = () => {
-                console.error("Kakao Maps API 스크립트를 로드하는데 실패했습니다.");
+                console.error(
+                    "Kakao Maps API 스크립트를 로드하는데 실패했습니다."
+                );
             };
         };
 
         loadKakaoMapScript();
 
-    const isRN = !!window.ReactNativeWebView;
-    const selfOrigin = location.protocol.startsWith("http") ? location.origin : undefined;
-    const allowedOrigins = new Set([
-        ...(selfOrigin ? [selfOrigin] : []),
-        "http://localhost:3000",
-        "http://localhost:5173",
-    ]);
+        const isRN = !!window.ReactNativeWebView;
+        const selfOrigin = location.protocol.startsWith("http")
+            ? location.origin
+            : undefined;
+        const allowedOrigins = new Set([
+            ...(selfOrigin ? [selfOrigin] : []),
+            "http://localhost:3000",
+            "http://localhost:5173",
+        ]);
 
         const messageHandler = (event: MessageEvent) => {
             // RN(WebView)에서만 origin === "null" 허용
-            if (!(isRN && event.origin === "null") && !allowedOrigins.has(event.origin)) return;
+            if (
+                !(isRN && event.origin === "null") &&
+                !allowedOrigins.has(event.origin)
+            )
+                return;
 
             // WebView message handling - only for non-MOVE commands if needed
             // Remove MOVE command handling - will use buttons instead
@@ -161,37 +201,58 @@ function App() {
         const containerEl = document.getElementById(mapId);
         const gestureHandler = (e: Event) => {
             const t = e.target as HTMLElement | null;
-            if (containerEl && t && containerEl.contains(t) && e.cancelable) e.preventDefault();
+            if (containerEl && t && containerEl.contains(t) && e.cancelable)
+                e.preventDefault();
         };
         const touchMoveHandler = (e: TouchEvent) => {
-            if (containerEl && e.target && containerEl.contains(e.target as Node)) e.preventDefault();
+            if (
+                containerEl &&
+                e.target &&
+                containerEl.contains(e.target as Node)
+            )
+                e.preventDefault();
         };
 
-        document.addEventListener("gesturestart", gestureHandler, { passive: false });
-        containerEl?.addEventListener("touchmove", touchMoveHandler, { passive: false });
+        document.addEventListener("gesturestart", gestureHandler, {
+            passive: false,
+        });
+        containerEl?.addEventListener("touchmove", touchMoveHandler, {
+            passive: false,
+        });
 
         return () => {
             document.removeEventListener("gesturestart", gestureHandler);
             containerEl?.removeEventListener("touchmove", touchMoveHandler);
             window.removeEventListener("message", messageHandler);
             // 생성한 오버레이 해제
-            overlays.forEach((o) => { o.setMap(null); });
+            overlays.forEach((o) => {
+                o.setMap(null);
+            });
             overlays.length = 0;
             window.map = undefined;
         };
     }, [mapId]);
 
     return (
-        <div className="App" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-            <div id={mapId} style={{ height: '50vh', width: "100vw" }} />
-            <div style={{ 
-                padding: '10px', 
-                display: 'flex', 
-                alignItems: 'center',
-                gap: '8px', 
-                backgroundColor: '#f5f5f5',
-                borderTop: '1px solid #ddd'
-            }}>
+        <div
+            className="App"
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                height: "100vh",
+            }}
+        >
+            <div id={mapId} style={{ height: "50vh", width: "100vw" }} />
+            <div
+                style={{
+                    padding: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    backgroundColor: "#f5f5f5",
+                    borderTop: "1px solid #ddd",
+                }}
+            >
                 <BusStops
                     busStops={busStops}
                     onSelect={(stop) => moveToLocation(stop.lat, stop.lng)}
