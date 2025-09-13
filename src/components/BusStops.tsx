@@ -1,21 +1,52 @@
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { BusStop } from "../data/busStops";
 
 type Props = {
     busStops: BusStop[];
     onSelect: (stop: BusStop) => void;
     onBusNumberSelect?: (n: number) => void;
+    onToggleBubble?: (stop?: BusStop) => void;
 };
 
 export default function BusStops({
     busStops,
     onSelect,
     onBusNumberSelect,
+    onToggleBubble,
 }: Props) {
     const [openStops, setOpenStops] = useState(false);
     const [openNumbers, setOpenNumbers] = useState(false);
     const listId = useId();
     const numbersId = useId();
+
+    const [disabled, setDisabled] = useState(false);
+    const disableTimeoutRef = useRef<number | null>(null);
+
+    useEffect(() => {
+        return () => {
+            if (disableTimeoutRef.current !== null) {
+                clearTimeout(disableTimeoutRef.current);
+                disableTimeoutRef.current = null;
+            }
+        };
+    }, []);
+
+    const handleClick = (action?: () => void) => {
+        if (disabled) return;
+        setDisabled(true);
+        try {
+            if (action) action();
+        } catch {
+            /* ignore */
+        }
+        if (disableTimeoutRef.current !== null) {
+            clearTimeout(disableTimeoutRef.current);
+        }
+        disableTimeoutRef.current = window.setTimeout(() => {
+            setDisabled(false);
+            disableTimeoutRef.current = null;
+        }, 650);
+    };
 
     const handleNumberClick = (n: number) => {
         if (onBusNumberSelect) onBusNumberSelect(n);
@@ -41,11 +72,14 @@ export default function BusStops({
                     type="button"
                     aria-expanded={openStops}
                     aria-controls={listId}
-                    onClick={() => {
-                        const next = !openStops;
-                        setOpenStops(next);
-                        if (next) setOpenNumbers(false);
-                    }}
+                    disabled={disabled}
+                    onClick={() =>
+                        handleClick(() => {
+                            const next = !openStops;
+                            setOpenStops(next);
+                            if (next) setOpenNumbers(false);
+                        })
+                    }
                     style={{
                         display: "inline-flex",
                         alignItems: "center",
@@ -53,7 +87,8 @@ export default function BusStops({
                         padding: "8px 12px",
                         border: "none",
                         background: "transparent",
-                        cursor: "pointer",
+                        cursor: disabled ? "not-allowed" : "pointer",
+                        opacity: disabled ? 0.6 : 1,
                     }}
                 >
                     <img
@@ -78,45 +113,50 @@ export default function BusStops({
                     aria-label="버스 정류장 목록"
                     style={{
                         display: openStops ? "grid" : "none",
-                        gridTemplateColumns: "repeat(2, 1fr)",
+                        gridTemplateColumns: "repeat(3, 1fr)",
                         gap: "8px",
                         width: "100%",
                         marginTop: 8,
                     }}
                 >
-                    {/* Only show two buttons: 단국대학교 and 죽전역 */}
-                    {[{ name: "단국대학교" }, { name: "죽전역" }].map(
-                        (stop) => (
-                            <button
-                                key={stop.name}
-                                type="button"
-                                onClick={() => {
-                                    // Find the actual stop object from busStops
+                    {/* 세 개 버튼: 죽전역, 치과병원, 정문 */}
+                    {[
+                        { name: "죽전역" },
+                        { name: "치과병원" },
+                        { name: "정문" },
+                    ].map((stop) => (
+                        <button
+                            key={stop.name}
+                            type="button"
+                            disabled={disabled}
+                            onClick={() =>
+                                handleClick(() => {
                                     const realStop = busStops.find(
-                                        (s) =>
-                                            (stop.name === "단국대학교" &&
-                                                (s.name === "치과병원" ||
-                                                    s.name === "단국대학교")) ||
-                                            s.name === stop.name
+                                        (s) => s.name === stop.name
                                     );
-                                    if (realStop) onSelect(realStop);
-                                }}
-                                style={{
-                                    padding: "16px 12px",
-                                    minHeight: "48px",
-                                    backgroundColor: "#007bff",
-                                    color: "white",
-                                    border: "none",
-                                    borderRadius: "4px",
-                                    cursor: "pointer",
-                                    fontSize: "16px",
-                                    fontWeight: "bold",
-                                }}
-                            >
-                                {stop.name}
-                            </button>
-                        )
-                    )}
+                                    if (realStop) {
+                                        onSelect(realStop);
+                                        if (onToggleBubble)
+                                            onToggleBubble(realStop);
+                                    }
+                                })
+                            }
+                            style={{
+                                padding: "16px 12px",
+                                minHeight: "48px",
+                                backgroundColor: "#007bff",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "4px",
+                                cursor: disabled ? "not-allowed" : "pointer",
+                                fontSize: "16px",
+                                fontWeight: "bold",
+                                opacity: disabled ? 0.6 : 1,
+                            }}
+                        >
+                            {stop.name}
+                        </button>
+                    ))}
                 </section>
             </div>
 
@@ -128,11 +168,14 @@ export default function BusStops({
                     type="button"
                     aria-expanded={openNumbers}
                     aria-controls={numbersId}
-                    onClick={() => {
-                        const next = !openNumbers;
-                        setOpenNumbers(next);
-                        if (next) setOpenStops(false);
-                    }}
+                    disabled={disabled}
+                    onClick={() =>
+                        handleClick(() => {
+                            const next = !openNumbers;
+                            setOpenNumbers(next);
+                            if (next) setOpenStops(false);
+                        })
+                    }
                     style={{
                         display: "inline-flex",
                         alignItems: "center",
@@ -140,7 +183,8 @@ export default function BusStops({
                         padding: "8px 12px",
                         border: "none",
                         background: "transparent",
-                        cursor: "pointer",
+                        cursor: disabled ? "not-allowed" : "pointer",
+                        opacity: disabled ? 0.6 : 1,
                     }}
                 >
                     <img
@@ -165,7 +209,7 @@ export default function BusStops({
                     aria-label="버스 번호 선택"
                     style={{
                         display: openNumbers ? "grid" : "none",
-                        gridTemplateColumns: "repeat(2, 1fr)",
+                        gridTemplateColumns: "repeat(3, 1fr)",
                         gap: "8px",
                         width: "100%",
                         marginTop: 8,
@@ -176,7 +220,10 @@ export default function BusStops({
                         <button
                             key={n}
                             type="button"
-                            onClick={() => handleNumberClick(n)}
+                            disabled={disabled}
+                            onClick={() =>
+                                handleClick(() => handleNumberClick(n))
+                            }
                             style={{
                                 padding: "16px 12px",
                                 minHeight: "48px",
@@ -184,16 +231,19 @@ export default function BusStops({
                                 color: "white",
                                 border: "none",
                                 borderRadius: "4px",
-                                cursor: "pointer",
+                                cursor: disabled ? "not-allowed" : "pointer",
                                 fontSize: "16px",
                                 fontWeight: "bold",
                                 transition: "background-color 0.15s ease",
+                                opacity: disabled ? 0.6 : 1,
                             }}
                             onPointerEnter={(e) => {
+                                if (disabled) return;
                                 e.currentTarget.style.backgroundColor =
                                     "#0056b3";
                             }}
                             onPointerLeave={(e) => {
+                                if (disabled) return;
                                 e.currentTarget.style.backgroundColor =
                                     "#007bff";
                             }}

@@ -23,15 +23,29 @@ declare global {
     interface Window {
         kakao: {
             maps: {
-                LatLng: new (lat: number, lng: number) => KakaoLatLng;
+                // LatLng factory / class
+                LatLng: new (
+                    lat: number,
+                    lng: number
+                ) => KakaoLatLng;
+                // Size used for pixel offsets
+                Size: new (
+                    width: number,
+                    height: number
+                ) => { width: number; height: number };
+                // Map constructor
                 Map: new (
                     container: HTMLElement,
                     options: { center: KakaoLatLng; level?: number }
                 ) => KakaoMap;
+                // CustomOverlay accepts a slightly more flexible options object
                 CustomOverlay: new (options: {
-                    position: KakaoLatLng;
+                    position: KakaoLatLng | { lat: number; lng: number };
                     content: HTMLElement | string;
                     yAnchor?: number;
+                    offset?: { width: number; height: number } | unknown;
+                    // some versions expose a clickable flag on overlays
+                    clickable?: boolean;
                 }) => KakaoOverlay;
                 load: (callback: () => void) => void;
             };
@@ -44,5 +58,8 @@ declare global {
         __pendingMove?: { lat: number; lng: number } | null;
         // Minimal React Native WebView typing to allow postMessage from the web app
         ReactNativeWebView?: { postMessage: (message: string) => void };
+        // internal bubble overlay handle / name used by the app
+        __currentBubbleOverlay?: KakaoOverlay | undefined;
+        __currentBubbleStopName?: string | undefined;
     }
 }
