@@ -1,5 +1,7 @@
-import { useEffect, useId } from "react";
+import { useEffect, useId, useState } from "react";
 import BusStops from "./components/BusStops";
+import Bubble from "./components/Bubble";
+
 import { busStops } from "./data/busStops";
 
 function App() {
@@ -100,11 +102,14 @@ function App() {
         window.__panAnimationId = requestAnimationFrame(step);
     };
 
+    const [bubbleStop, setBubbleStop] = useState<
+        { lat: number; lng: number; name: string } | undefined
+    >(undefined);
+
     useEffect(() => {
         const kakaoApiKey = import.meta.env.VITE_KAKAO_MAP_API_KEY;
         const overlays: OverlayHandle[] = [];
 
-        // Guard against multiple initMap executions in StrictMode
         let mapInitialized = false;
 
         const initMap = () => {
@@ -225,9 +230,7 @@ function App() {
             let script = document.getElementById(scriptId) as HTMLScriptElement;
 
             if (script) {
-                // Script exists but may not be loaded yet
                 if (!window.kakao?.maps?.load) {
-                    // Attach handlers to existing script if not loaded
                     script.onload = () => {
                         window.kakao.maps.load(initMap);
                     };
@@ -277,9 +280,6 @@ function App() {
                 !allowedOrigins.has(event.origin)
             )
                 return;
-
-            // WebView message handling - only for non-MOVE commands if needed
-            // Remove MOVE command handling - will use buttons instead
         };
         window.addEventListener("message", messageHandler);
 
@@ -314,6 +314,15 @@ function App() {
                 o.setMap(null);
             });
             overlays.length = 0;
+            // 말풍선 오버레이 해제 (있다면)
+            try {
+                const bubble = (window as any).__currentBubbleOverlay;
+                if (bubble) bubble.setMap(null);
+            } catch {
+                /* ignore */
+            }
+            (window as any).__currentBubbleOverlay = undefined;
+            (window as any).__currentBubbleStopName = undefined;
             window.map = undefined;
         };
     }, [mapId]);
@@ -328,6 +337,7 @@ function App() {
             }}
         >
             <div id={mapId} style={{ height: "50vh", width: "100vw" }} />
+            <Bubble stop={bubbleStop} onClose={() => setBubbleStop(undefined)} />
             <div
                 style={{
                     padding: "10px",
@@ -341,6 +351,11 @@ function App() {
                 <BusStops
                     busStops={busStops}
                     onSelect={(stop) => moveToLocation(stop.lat, stop.lng)}
+                    onToggleBubble={(stop) => {
+                        // Always show the bubble for the selected stop.
+                        // Do not toggle it off when the same stop is clicked again.
+                        setBubbleStop(stop);
+                    }}
                 />
             </div>
         </div>
