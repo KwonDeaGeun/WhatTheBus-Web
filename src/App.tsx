@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from "react";
-import BusStops from "./components/BusStops";
 import Bubble from "./components/Bubble";
+import BusStops from "./components/BusStops";
 
 import { busStops } from "./data/busStops";
 
@@ -316,13 +316,13 @@ function App() {
             overlays.length = 0;
             // 말풍선 오버레이 해제 (있다면)
             try {
-                const bubble = (window as any).__currentBubbleOverlay;
+                const bubble = window.__currentBubbleOverlay;
                 if (bubble) bubble.setMap(null);
             } catch {
                 /* ignore */
             }
-            (window as any).__currentBubbleOverlay = undefined;
-            (window as any).__currentBubbleStopName = undefined;
+            window.__currentBubbleOverlay = undefined;
+            window.__currentBubbleStopName = undefined;
             window.map = undefined;
         };
     }, [mapId]);
@@ -337,7 +337,10 @@ function App() {
             }}
         >
             <div id={mapId} style={{ height: "50vh", width: "100vw" }} />
-            <Bubble stop={bubbleStop} onClose={() => setBubbleStop(undefined)} />
+            <Bubble
+                stop={bubbleStop}
+                onClose={() => setBubbleStop(undefined)}
+            />
             <div
                 style={{
                     padding: "10px",

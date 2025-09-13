@@ -1,4 +1,4 @@
-import { useId, useState, useRef, useEffect } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { BusStop } from "../data/busStops";
 
 type Props = {
@@ -136,7 +136,8 @@ export default function BusStops({
                                     );
                                     if (realStop) {
                                         onSelect(realStop);
-                                        if (onToggleBubble) onToggleBubble(realStop);
+                                        if (onToggleBubble)
+                                            onToggleBubble(realStop);
                                     }
                                 })
                             }
@@ -220,7 +221,9 @@ export default function BusStops({
                             key={n}
                             type="button"
                             disabled={disabled}
-                            onClick={() => handleClick(() => handleNumberClick(n))}
+                            onClick={() =>
+                                handleClick(() => handleNumberClick(n))
+                            }
                             style={{
                                 padding: "16px 12px",
                                 minHeight: "48px",
@@ -236,11 +239,13 @@ export default function BusStops({
                             }}
                             onPointerEnter={(e) => {
                                 if (disabled) return;
-                                e.currentTarget.style.backgroundColor = "#0056b3";
+                                e.currentTarget.style.backgroundColor =
+                                    "#0056b3";
                             }}
                             onPointerLeave={(e) => {
                                 if (disabled) return;
-                                e.currentTarget.style.backgroundColor = "#007bff";
+                                e.currentTarget.style.backgroundColor =
+                                    "#007bff";
                             }}
                         >
                             {n}

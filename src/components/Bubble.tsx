@@ -11,8 +11,9 @@ export default function Bubble({ stop, onClose }: Props) {
     useEffect(() => {
         if (typeof window.kakao === "undefined" || !window.map) return;
 
-        let overlay: Window["__currentBubbleOverlay"] | undefined = undefined;
-        let idleHandler: (() => void) | undefined = undefined;
+        let overlay: Window["__currentBubbleOverlay"] | undefined;
+        let idleHandler: (() => void) | undefined;
+        const map = window.map;
 
         try {
             const clearExisting = () => {
@@ -66,12 +67,15 @@ export default function Bubble({ stop, onClose }: Props) {
                     el.style.transform = "translateY(-40px)";
 
                     overlay = new window.kakao.maps.CustomOverlay({
-                        position: new window.kakao.maps.LatLng(stop.lat, stop.lng),
+                        position: new window.kakao.maps.LatLng(
+                            stop.lat,
+                            stop.lng
+                        ),
                         content: el,
                         yAnchor: 1,
                         offset: new window.kakao.maps.Size(0, 0),
                     });
-                    overlay.setMap(window.map!);
+                    overlay.setMap(map);
 
                     setTimeout(() => {
                         try {
@@ -81,10 +85,12 @@ export default function Bubble({ stop, onClose }: Props) {
                             elToStyle.style.zIndex = "100";
                             elToStyle.style.overflow = "visible";
                             if (elToStyle.parentElement) {
-                                elToStyle.parentElement.style.position = "relative";
+                                elToStyle.parentElement.style.position =
+                                    "relative";
                                 elToStyle.parentElement.style.zIndex = "100";
                                 // Ensure the wrapper doesn't clip the bubble
-                                elToStyle.parentElement.style.overflow = "visible";
+                                elToStyle.parentElement.style.overflow =
+                                    "visible";
                             }
                         } catch {
                             /* ignore */
@@ -104,15 +110,17 @@ export default function Bubble({ stop, onClose }: Props) {
             // before actually creating the overlay.
             try {
                 if (
-                    window.kakao &&
-                    window.kakao.maps &&
-                    window.kakao.maps.event &&
-                    typeof window.kakao.maps.event.addListener === "function"
+                    window.kakao?.maps?.event &&
+                    typeof window.kakao?.maps?.event?.addListener === "function"
                 ) {
                     idleHandler = () => {
                         try {
-                            if (window.kakao && window.kakao.maps && window.kakao.maps.event && idleHandler) {
-                                window.kakao.maps.event.removeListener(window.map!, "idle", idleHandler);
+                            if (window.kakao?.maps?.event && idleHandler) {
+                                window.kakao.maps.event.removeListener(
+                                    map,
+                                    "idle",
+                                    idleHandler
+                                );
                             }
                         } catch {
                             /* ignore */
@@ -134,7 +142,11 @@ export default function Bubble({ stop, onClose }: Props) {
                         };
                         waitForPanToFinish();
                     };
-                    window.kakao.maps.event.addListener(window.map!, "idle", idleHandler);
+                    window.kakao.maps.event.addListener(
+                        map,
+                        "idle",
+                        idleHandler
+                    );
                 } else {
                     // Fallback: wait for any pan animation to finish, then show
                     const waitForPanAndShow = () => {
@@ -179,8 +191,12 @@ export default function Bubble({ stop, onClose }: Props) {
                 /* ignore */
             }
             try {
-                if (idleHandler && window.kakao && window.kakao.maps && window.kakao.maps.event) {
-                    window.kakao.maps.event.removeListener(window.map!, "idle", idleHandler);
+                if (idleHandler && window.kakao?.maps?.event) {
+                    window.kakao.maps.event.removeListener(
+                        map,
+                        "idle",
+                        idleHandler
+                    );
                 }
             } catch {
                 /* ignore */

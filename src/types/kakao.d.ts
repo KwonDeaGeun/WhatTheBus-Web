@@ -24,9 +24,15 @@ declare global {
         kakao: {
             maps: {
                 // LatLng factory / class
-                LatLng: new (lat: number, lng: number) => KakaoLatLng;
+                LatLng: new (
+                    lat: number,
+                    lng: number
+                ) => KakaoLatLng;
                 // Size used for pixel offsets
-                Size: new (width: number, height: number) => { width: number; height: number };
+                Size: new (
+                    width: number,
+                    height: number
+                ) => { width: number; height: number };
                 // Map constructor
                 Map: new (
                     container: HTMLElement,
@@ -37,7 +43,7 @@ declare global {
                     position: KakaoLatLng | { lat: number; lng: number };
                     content: HTMLElement | string;
                     yAnchor?: number;
-                    offset?: { width: number; height: number } | any;
+                    offset?: { width: number; height: number } | unknown;
                     // some versions expose a clickable flag on overlays
                     clickable?: boolean;
                 }) => KakaoOverlay;
