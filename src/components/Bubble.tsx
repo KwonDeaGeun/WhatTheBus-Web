@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import { createRoot } from "react-dom/client";
+import { BusFront } from "lucide-react";
 
 type Stop = { lat: number; lng: number; name: string };
 
@@ -12,8 +14,6 @@ export default function Bubble({ stop, onClose }: Props) {
         if (typeof window.kakao === "undefined" || !window.map) return;
 
         let overlay: Window["__currentBubbleOverlay"] | undefined;
-        let idleHandler: (() => void) | undefined;
-        const map = window.map;
 
         try {
             const clearExisting = () => {
@@ -34,27 +34,47 @@ export default function Bubble({ stop, onClose }: Props) {
 
             clearExisting();
 
-            const createAndShowOverlay = () => {
-                try {
-                    const el = document.createElement("div");
-                    el.style.background = "white";
-                    el.style.padding = "8px 10px";
-                    el.style.borderRadius = "6px";
-                    el.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
-                    el.style.fontSize = "14px";
-                    el.style.fontWeight = "600";
-                    el.style.cursor = "pointer";
-                    // keep text on one line but allow the element to size to content
-                    el.style.whiteSpace = "nowrap";
-                    el.style.display = "inline-block";
-                    el.style.width = "auto";
-                    el.style.maxWidth = "none";
-                    el.style.overflow = "visible";
-                    el.style.boxSizing = "border-box";
-                    el.style.zIndex = "200";
-                    el.textContent = stop.name;
+const createAndShowOverlay = () => {
+    try {
+        // container element where we'll mount a small React subtree
+        const el = document.createElement("div");
+        // fixed container positioning (body-level)
+        el.style.position = "fixed";
+        el.style.top = "16px";
+        el.style.left = "16px";
+        el.style.right = "16px";
+        el.style.marginLeft = "auto";
+        el.style.marginRight = "auto";
+        el.style.zIndex = "200";
+        document.body.appendChild(el);
 
-                    el.onclick = () => {
+        const nameMap: Record<string, string> = {
+            "죽전역": "죽전역(단국대학교 방향)",
+            "치과병원": "치과병원(단국대학교 방향)",
+            "정문": "정문(죽전역 방향)",
+        };
+        const displayName = Object.entries(nameMap).reduce(
+            (acc, [k, v]) => acc.replace(new RegExp(k, "g"), v),
+            String(stop.name)
+        );
+
+        const root = createRoot(el);
+        root.render(
+            <div
+                style={{
+                    position: "fixed",
+                    top: "16px",
+                    left: "16px",
+                    right: "16px",
+                    zIndex: 200,
+                    display: "flex",
+                    justifyContent: "center",
+                }}
+            >
+                {/* modal panel positioned at top with 16px horizontal margins */}
+                <button
+                    type="button"
+                    onClick={() => {
                         try {
                             if (overlay) overlay.setMap(null);
                         } catch {
@@ -63,122 +83,86 @@ export default function Bubble({ stop, onClose }: Props) {
                         window.__currentBubbleOverlay = undefined;
                         window.__currentBubbleStopName = undefined;
                         if (onClose) onClose();
-                    };
-                    el.style.transform = "translateY(-40px)";
+                    }}
+                    style={{
+                        position: "relative",
+                        background: "white",
+                        padding: "12px 14px",
+                        borderRadius: "8px",
+                        boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+                        maxWidth: "450px",
+                        width: "100%",
+                        boxSizing: "border-box",
+                        textAlign: "left",
+                        cursor: "pointer",
+                        border: "none",
+                    }}
+                >
+                    <div style={{ fontWeight: 600 }}>{displayName}</div>
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            marginTop: "8px",
+                            fontWeight: 400,
+                            fontSize: "13px",
+                        }}
+                    >
+                        <BusFront size={16} color="#f6c341" />
+                        <span>
+                            <span style={{ color: "#f6c341", fontWeight: 700 }}>
+                                24
+                            </span>
+                            <span style={{ marginLeft: 8 }}>| 5분 남음</span>
+                        </span>
+                    </div>
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            marginTop: "6px",
+                            fontWeight: 400,
+                            fontSize: "13px",
+                        }}
+                    >
+                        <BusFront size={16} color="#7dd3fc" />
+                        <span>
+                            <span style={{ color: "#7dd3fc", fontWeight: 700 }}>
+                                720-3
+                            </span>
+                            <span style={{ marginLeft: 8 }}>| 15분 남음</span>
+                        </span>
+                    </div>
+                </button>
+            </div>
+        );
 
-                    overlay = new window.kakao.maps.CustomOverlay({
-                        position: new window.kakao.maps.LatLng(
-                            stop.lat,
-                            stop.lng
-                        ),
-                        content: el,
-                        yAnchor: 1,
-                        offset: new window.kakao.maps.Size(0, 0),
-                    });
-                    overlay.setMap(map);
-
-                    setTimeout(() => {
-                        try {
-                            // Use the created element directly to avoid relying on overlay's runtime API
-                            const elToStyle = el;
-                            elToStyle.style.position = "relative";
-                            elToStyle.style.zIndex = "100";
-                            elToStyle.style.overflow = "visible";
-                            if (elToStyle.parentElement) {
-                                elToStyle.parentElement.style.position =
-                                    "relative";
-                                elToStyle.parentElement.style.zIndex = "100";
-                                // Ensure the wrapper doesn't clip the bubble
-                                elToStyle.parentElement.style.overflow =
-                                    "visible";
-                            }
-                        } catch {
-                            /* ignore */
-                        }
-                    }, 30);
-
-                    window.__currentBubbleOverlay = overlay;
-                    window.__currentBubbleStopName = stop.name;
-                } catch {
-                    /* ignore */
+        overlay = {
+            setMap: (m: Window["map"] | null) => {
+                if (m === null) {
+                    try {
+                        root.unmount();
+                        if (el.parentElement) el.remove();
+                    } catch {
+                        /* ignore */
+                    }
                 }
-            };
+            },
+        } as Window["__currentBubbleOverlay"];
 
-            // Wait until the map finishes moving (idle) before showing the bubble.
-            // Register a one-time 'idle' listener and, after the idle event,
-            // wait for any custom pan animation (__panAnimationId) to finish
-            // before actually creating the overlay.
+        window.__currentBubbleOverlay = overlay;
+        window.__currentBubbleStopName = stop.name;
+    } catch {
+        /* ignore */
+    }
+};
+            // Show immediately when stop is set (triggered by button click); do not wait for map idle/pan.
             try {
-                if (
-                    window.kakao?.maps?.event &&
-                    typeof window.kakao?.maps?.event?.addListener === "function"
-                ) {
-                    idleHandler = () => {
-                        try {
-                            if (window.kakao?.maps?.event && idleHandler) {
-                                window.kakao.maps.event.removeListener(
-                                    map,
-                                    "idle",
-                                    idleHandler
-                                );
-                            }
-                        } catch {
-                            /* ignore */
-                        }
-                        const waitForPanToFinish = () => {
-                            if (typeof window.__panAnimationId === "number") {
-                                // animation still running; check next frame
-                                requestAnimationFrame(waitForPanToFinish);
-                                return;
-                            }
-                            // small timeout to ensure map settled, then show
-                            setTimeout(() => {
-                                try {
-                                    createAndShowOverlay();
-                                } catch {
-                                    /* ignore */
-                                }
-                            }, 0);
-                        };
-                        waitForPanToFinish();
-                    };
-                    window.kakao.maps.event.addListener(
-                        map,
-                        "idle",
-                        idleHandler
-                    );
-                } else {
-                    // Fallback: wait for any pan animation to finish, then show
-                    const waitForPanAndShow = () => {
-                        const waiter = () => {
-                            if (typeof window.__panAnimationId === "number") {
-                                requestAnimationFrame(waiter);
-                                return;
-                            }
-                            try {
-                                createAndShowOverlay();
-                            } catch {
-                                /* ignore */
-                            }
-                        };
-                        waiter();
-                    };
-                    waitForPanAndShow();
-                }
+                createAndShowOverlay();
             } catch {
-                // If listener registration fails, fallback to waiting for pan to finish and show
-                try {
-                    const waiter = () => {
-                        if (typeof window.__panAnimationId === "number") {
-                            requestAnimationFrame(waiter);
-                            return;
-                        }
-                        createAndShowOverlay();
-                    };
-                    waiter();
-                } catch {
-                    /* ignore */
-                }
+                /* ignore */
             }
         } catch {
             /* ignore */
@@ -187,17 +171,6 @@ export default function Bubble({ stop, onClose }: Props) {
         return () => {
             try {
                 if (overlay) overlay.setMap(null);
-            } catch {
-                /* ignore */
-            }
-            try {
-                if (idleHandler && window.kakao?.maps?.event) {
-                    window.kakao.maps.event.removeListener(
-                        map,
-                        "idle",
-                        idleHandler
-                    );
-                }
             } catch {
                 /* ignore */
             }
