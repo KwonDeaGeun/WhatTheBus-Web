@@ -14,7 +14,6 @@ export default function Bubble({ stop, onClose }: Props) {
         if (typeof window.kakao === "undefined" || !window.map) return;
 
         let overlay: Window["__currentBubbleOverlay"] | undefined;
-        const map = window.map;
 
         try {
             const clearExisting = () => {
