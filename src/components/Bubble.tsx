@@ -137,7 +137,7 @@ const createAndShowOverlay = () => {
         );
 
         overlay = {
-            setMap: (m: any) => {
+            setMap: (m: Window["map"] | null) => {
                 if (m === null) {
                     try {
                         root.unmount();
@@ -147,7 +147,7 @@ const createAndShowOverlay = () => {
                     }
                 }
             },
-        } as any;
+        } as Window["__currentBubbleOverlay"];
 
         window.__currentBubbleOverlay = overlay;
         window.__currentBubbleStopName = stop.name;
