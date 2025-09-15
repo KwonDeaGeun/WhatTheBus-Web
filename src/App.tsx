@@ -336,7 +336,7 @@ function App() {
                 height: "100vh",
             }}
         >
-            <div id={mapId} style={{ height: "50vh", width: "100vw" }} />
+            <div id={mapId} style={{ height: "70vh", width: "100vw" }} />
             <Bubble
                 stop={bubbleStop}
                 onClose={() => setBubbleStop(undefined)}
