@@ -14,7 +14,6 @@ export default function Bubble({ stop, onClose }: Props) {
         if (typeof window.kakao === "undefined" || !window.map) return;
 
         let overlay: Window["__currentBubbleOverlay"] | undefined;
-        let idleHandler: (() => void) | undefined;
         const map = window.map;
 
         try {
@@ -50,10 +49,15 @@ const createAndShowOverlay = () => {
         el.style.zIndex = "200";
         document.body.appendChild(el);
 
-        const displayName = String(stop.name)
-            .replace(/죽전역/g, "죽전역(단국대학교 방향)")
-            .replace(/치과병원/g, "치과병원(단국대학교 방향)")
-            .replace(/정문/g, "정문(죽전역 방향)");
+        const nameMap: Record<string, string> = {
+            "죽전역": "죽전역(단국대학교 방향)",
+            "치과병원": "치과병원(단국대학교 방향)",
+            "정문": "정문(죽전역 방향)",
+        };
+        const displayName = Object.entries(nameMap).reduce(
+            (acc, [k, v]) => acc.replace(new RegExp(k, "g"), v),
+            String(stop.name)
+        );
 
         const root = createRoot(el);
         root.render(
@@ -168,17 +172,6 @@ const createAndShowOverlay = () => {
         return () => {
             try {
                 if (overlay) overlay.setMap(null);
-            } catch {
-                /* ignore */
-            }
-            try {
-                if (idleHandler && window.kakao?.maps?.event) {
-                    window.kakao.maps.event.removeListener(
-                        map,
-                        "idle",
-                        idleHandler
-                    );
-                }
             } catch {
                 /* ignore */
             }
