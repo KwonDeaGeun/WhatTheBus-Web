@@ -1,8 +1,11 @@
 import { useEffect, useId, useState } from "react";
+import { createRoot } from "react-dom/client";
+import { Bus } from "lucide-react";
 import Bubble from "./components/Bubble";
 import BusStops from "./components/BusStops";
 
 import { busStops } from "./data/busStops";
+import { busStops as buses } from "./data/bus";
 
 function App() {
     const mapId = useId();
@@ -217,6 +220,33 @@ function App() {
                 });
                 overlay.setMap(map);
                 overlays.push(overlay as OverlayHandle);
+            });
+
+            // Add bus icons from bus.ts data
+            buses.forEach((bus) => {
+                const busDiv = document.createElement("div");
+                busDiv.style.width = "40px";
+                busDiv.style.height = "40px";
+                busDiv.style.display = "flex";
+                busDiv.style.alignItems = "center";
+                busDiv.style.justifyContent = "center";
+                busDiv.style.cursor = "pointer";
+
+                // Create React root and render Bus icon
+                const root = createRoot(busDiv);
+                root.render(<Bus color="#a12b00ff" size={32} />);
+
+                const busPosition = new window.kakao.maps.LatLng(
+                    bus.lat,
+                    bus.lng
+                );
+                const busOverlay = new window.kakao.maps.CustomOverlay({
+                    position: busPosition,
+                    content: busDiv,
+                    yAnchor: 1,
+                });
+                busOverlay.setMap(map);
+                overlays.push(busOverlay as OverlayHandle);
             });
         };
 
