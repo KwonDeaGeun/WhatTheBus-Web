@@ -357,6 +357,22 @@ function App() {
         };
     }, [mapId]);
 
+    const handleBusNumberSelect = (n: number) => {
+        try {
+            const idx = n - 1;
+            const bus = buses[idx];
+            if (bus && Number.isFinite(bus.lat) && Number.isFinite(bus.lng)) {
+                moveToLocation(bus.lat, bus.lng);
+            } else {
+                // eslint-disable-next-line no-console
+                console.warn(`No bus data for number ${n}`);
+            }
+        } catch (err) {
+            // eslint-disable-next-line no-console
+            console.error(err);
+        }
+    };
+
     return (
         <div
             className="App"
@@ -384,6 +400,7 @@ function App() {
                 <BusStops
                     busStops={busStops}
                     onSelect={(stop) => moveToLocation(stop.lat, stop.lng)}
+                    onBusNumberSelect={handleBusNumberSelect}
                     onToggleBubble={(stop) => {
                         // Always show the bubble for the selected stop.
                         // Do not toggle it off when the same stop is clicked again.
