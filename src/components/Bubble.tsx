@@ -54,7 +54,7 @@ export default function Bubble({ stop, onClose }: Props) {
                         정문: "정문(죽전역 방향)",
                     };
                     const displayName = Object.entries(nameMap).reduce(
-                        (acc, [k, v]) => acc.replace(new RegExp(k, "g"), v),
+                        (acc, [k, v]) => acc.split(k).join(v),
                         String(stop.name)
                     );
 
