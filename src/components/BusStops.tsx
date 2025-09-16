@@ -100,7 +100,7 @@ export default function BusStops({
                     <span
                         style={{
                             color: "#333",
-                            fontSize: 14,
+                            fontSize: 16,
                             display: openStops ? "none" : "inline",
                         }}
                     >
@@ -196,7 +196,7 @@ export default function BusStops({
                     <span
                         style={{
                             color: "#333",
-                            fontSize: 14,
+                            fontSize: 16,
                             display: openNumbers ? "none" : "inline",
                         }}
                     >
