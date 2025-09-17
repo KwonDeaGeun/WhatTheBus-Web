@@ -365,7 +365,10 @@ function App() {
                 moveToLocation(bus.lat, bus.lng);
                 // Use the existing `Bubble` component to render the styled bubble
                 try {
-                    const label = `셔틀버스(${String(bus.direction)} 방향)`;
+                    const dir = bus.direction;
+                    const label = dir === null || dir === undefined || String(dir).trim() === ""
+                        ? "셔틀버스"
+                        : `셔틀버스(${String(dir)} 방향)`;
                     setBubbleStop({ lat: bus.lat, lng: bus.lng, name: label });
                 } catch {
                     /* ignore */
