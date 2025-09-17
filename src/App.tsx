@@ -1,11 +1,8 @@
 import { useEffect, useId, useState } from "react";
-import { createRoot } from "react-dom/client";
-import { Bus } from "lucide-react";
 import Bubble from "./components/Bubble";
 import BusStops from "./components/BusStops";
-
-import { busStops } from "./data/busStops";
 import { busStops as buses } from "./data/bus";
+import { busStops } from "./data/busStops";
 
 function App() {
     const mapId = useId();
@@ -222,7 +219,6 @@ function App() {
                 overlays.push(overlay as OverlayHandle);
             });
 
-            // Add bus icons from bus.ts data
             buses.forEach((bus) => {
                 const busDiv = document.createElement("div");
                 busDiv.style.width = "40px";
@@ -232,9 +228,13 @@ function App() {
                 busDiv.style.justifyContent = "center";
                 busDiv.style.cursor = "pointer";
 
-                // Create React root and render Bus icon
-                const root = createRoot(busDiv);
-                root.render(<Bus color="#a12b00ff" size={32} />);
+                const img = document.createElement("img");
+                img.src = "/ic_busfront.svg";
+                img.alt = bus.name || "bus";
+                img.style.width = "32px";
+                img.style.height = "32px";
+                img.style.display = "block";
+                busDiv.appendChild(img);
 
                 const busPosition = new window.kakao.maps.LatLng(
                     bus.lat,
@@ -363,6 +363,13 @@ function App() {
             const bus = buses[idx];
             if (bus && Number.isFinite(bus.lat) && Number.isFinite(bus.lng)) {
                 moveToLocation(bus.lat, bus.lng);
+                // Use the existing `Bubble` component to render the styled bubble
+                try {
+                    const label = `셔틀버스(${String(bus.content)} 방향)`;
+                    setBubbleStop({ lat: bus.lat, lng: bus.lng, name: label });
+                } catch {
+                    /* ignore */
+                }
             } else {
                 // eslint-disable-next-line no-console
                 console.warn(`No bus data for number ${n}`);

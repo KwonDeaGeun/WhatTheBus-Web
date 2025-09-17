@@ -53,10 +53,8 @@ export default function Bubble({ stop, onClose }: Props) {
                         치과병원: "치과병원(단국대학교 방향)",
                         정문: "정문(죽전역 방향)",
                     };
-                    const displayName = Object.entries(nameMap).reduce(
-                        (acc, [k, v]) => acc.split(k).join(v),
-                        String(stop.name)
-                    );
+                    const rawName = String(stop.name);
+                    const displayName = nameMap[rawName] ?? rawName;
 
                     const root = createRoot(el);
                     root.render(
@@ -101,56 +99,66 @@ export default function Bubble({ stop, onClose }: Props) {
                                 <div style={{ fontWeight: 600 }}>
                                     {displayName}
                                 </div>
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "8px",
-                                        marginTop: "8px",
-                                        fontWeight: 400,
-                                        fontSize: "16px",
-                                    }}
-                                >
-                                    <BusFront size={16} color="#f6c341" />
-                                    <span>
-                                        <span
+                                {!String(stop.name).startsWith("셔틀버스") && (
+                                    <>
+                                        <div
                                             style={{
-                                                color: "#f6c341",
-                                                fontWeight: 700,
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: "8px",
+                                                marginTop: "8px",
+                                                fontWeight: 400,
+                                                fontSize: "16px",
                                             }}
                                         >
-                                            24
-                                        </span>
-                                        <span style={{ marginLeft: 8 }}>
-                                            | 5분 남음
-                                        </span>
-                                    </span>
-                                </div>
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "8px",
-                                        marginTop: "6px",
-                                        fontWeight: 400,
-                                        fontSize: "16px",
-                                    }}
-                                >
-                                    <BusFront size={16} color="#7dd3fc" />
-                                    <span>
-                                        <span
+                                            <BusFront
+                                                size={16}
+                                                color="#f6c341"
+                                            />
+                                            <span>
+                                                <span
+                                                    style={{
+                                                        color: "#f6c341",
+                                                        fontWeight: 700,
+                                                    }}
+                                                >
+                                                    24
+                                                </span>
+                                                <span style={{ marginLeft: 8 }}>
+                                                    | 5분 남음
+                                                </span>
+                                            </span>
+                                        </div>
+                                        <div
                                             style={{
-                                                color: "#7dd3fc",
-                                                fontWeight: 700,
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: "8px",
+                                                marginTop: "6px",
+                                                fontWeight: 400,
+                                                fontSize: "16px",
                                             }}
                                         >
-                                            720-3
-                                        </span>
-                                        <span style={{ marginLeft: 8 }}>
-                                            | 15분 남음
-                                        </span>
-                                    </span>
-                                </div>
+                                            <BusFront
+                                                size={16}
+                                                color="#7dd3fc"
+                                            />
+                                            <span>
+                                                <span
+                                                    style={{
+                                                        color: "#7dd3fc",
+                                                        fontWeight: 700,
+                                                    }}
+                                                >
+                                                    720-3
+                                                </span>
+                                                <span style={{ marginLeft: 8 }}>
+                                                    | 15분 남음
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </>
+                                )}
                             </button>
                         </div>
                     );
