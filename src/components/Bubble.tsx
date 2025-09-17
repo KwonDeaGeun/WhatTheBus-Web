@@ -62,7 +62,7 @@ export default function Bubble({ stop, onClose }: Props) {
                         <div
                             style={{
                                 position: "fixed",
-                                top: "32px",
+                                top: "40px",
                                 left: "16px",
                                 right: "16px",
                                 zIndex: 200,
