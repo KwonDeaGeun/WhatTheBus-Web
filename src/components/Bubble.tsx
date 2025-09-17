@@ -2,6 +2,12 @@ import { BusFront } from "lucide-react";
 import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 
+const DISPLAY_NAME_MAP: Record<string, string> = {
+    죽전역: "죽전역(단국대학교 방향)",
+    치과병원: "치과병원(단국대학교 방향)",
+    정문: "정문(죽전역 방향)",
+};
+
 type Stop = { lat: number; lng: number; name: string };
 
 type Props = {
@@ -35,9 +41,9 @@ export default function Bubble({ stop, onClose }: Props) {
             clearExisting();
 
             const createAndShowOverlay = () => {
+                // container element where we'll mount a small React subtree
+                const el = document.createElement("div");
                 try {
-                    // container element where we'll mount a small React subtree
-                    const el = document.createElement("div");
                     // fixed container positioning (body-level)
                     el.style.position = "fixed";
                     el.style.top = "16px";
@@ -48,13 +54,8 @@ export default function Bubble({ stop, onClose }: Props) {
                     el.style.zIndex = "200";
                     document.body.appendChild(el);
 
-                    const nameMap: Record<string, string> = {
-                        죽전역: "죽전역(단국대학교 방향)",
-                        치과병원: "치과병원(단국대학교 방향)",
-                        정문: "정문(죽전역 방향)",
-                    };
                     const rawName = String(stop.name);
-                    const displayName = nameMap[rawName] ?? rawName;
+                    const displayName = DISPLAY_NAME_MAP[rawName] ?? rawName;
 
                     const root = createRoot(el);
                     root.render(
@@ -167,9 +168,6 @@ export default function Bubble({ stop, onClose }: Props) {
                         setMap: (m: Window["map"] | null) => {
                             if (m === null) {
                                 try {
-                                    // Avoid synchronous unmount while React is rendering.
-                                    // Schedule unmount on a microtask so we don't unmount during an ongoing render,
-                                    // which causes "Attempted to synchronously unmount a root while React was already rendering."
                                     Promise.resolve().then(() => {
                                         try {
                                             root.unmount();
@@ -189,6 +187,13 @@ export default function Bubble({ stop, onClose }: Props) {
                     window.__currentBubbleStopName = stop.name;
                 } catch {
                     /* ignore */
+                } finally {
+                    // If overlay creation failed before assigning `overlay`, ensure element is removed.
+                    try {
+                        if (!overlay && el.parentElement) el.remove();
+                    } catch {
+                        /* ignore */
+                    }
                 }
             };
             // Show immediately when stop is set (triggered by button click); do not wait for map idle/pan.
