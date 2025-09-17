@@ -235,16 +235,6 @@ export default function BusStops({
                                 transition: "background-color 0.15s ease",
                                 opacity: disabled ? 0.6 : 1,
                             }}
-                            onPointerEnter={(e) => {
-                                if (disabled) return;
-                                e.currentTarget.style.backgroundColor =
-                                    "#0056b3";
-                            }}
-                            onPointerLeave={(e) => {
-                                if (disabled) return;
-                                e.currentTarget.style.backgroundColor =
-                                    "#007bff";
-                            }}
                         >
                             {n}
                         </button>

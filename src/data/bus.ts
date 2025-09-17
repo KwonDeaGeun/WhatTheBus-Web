@@ -3,7 +3,7 @@ export interface Bus {
     name: string;
     lat: number;
     lng: number;
-    direction: string;
+    direction: string|null;
 }
 
 export const buses: ReadonlyArray<Bus> = [
@@ -12,7 +12,7 @@ export const buses: ReadonlyArray<Bus> = [
         name: "bus1",
         lat: 37.323494,
         lng: 127.123008,
-        direction: "죽전역",
+        direction: null,
     },
     {
         id: 2,
