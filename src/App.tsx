@@ -1,7 +1,7 @@
 import { useEffect, useId, useState } from "react";
 import Bubble from "./components/Bubble";
 import BusStops from "./components/BusStops";
-import { busStops as buses } from "./data/bus";
+import { buses } from "./data/bus";
 import { busStops } from "./data/busStops";
 
 function App() {
