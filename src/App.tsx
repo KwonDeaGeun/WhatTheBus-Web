@@ -1,7 +1,7 @@
 import { useEffect, useId, useState } from "react";
 import Bubble from "./components/Bubble";
 import BusStops from "./components/BusStops";
-
+import { buses } from "./data/bus";
 import { busStops } from "./data/busStops";
 
 function App() {
@@ -218,6 +218,36 @@ function App() {
                 overlay.setMap(map);
                 overlays.push(overlay as OverlayHandle);
             });
+
+            buses.forEach((bus) => {
+                const busDiv = document.createElement("div");
+                busDiv.style.width = "40px";
+                busDiv.style.height = "40px";
+                busDiv.style.display = "flex";
+                busDiv.style.alignItems = "center";
+                busDiv.style.justifyContent = "center";
+                busDiv.style.cursor = "pointer";
+
+                const img = document.createElement("img");
+                img.src = "/ic_busfront.svg";
+                img.alt = bus.name || "bus";
+                img.style.width = "32px";
+                img.style.height = "32px";
+                img.style.display = "block";
+                busDiv.appendChild(img);
+
+                const busPosition = new window.kakao.maps.LatLng(
+                    bus.lat,
+                    bus.lng
+                );
+                const busOverlay = new window.kakao.maps.CustomOverlay({
+                    position: busPosition,
+                    content: busDiv,
+                    yAnchor: 1,
+                });
+                busOverlay.setMap(map);
+                overlays.push(busOverlay as OverlayHandle);
+            });
         };
 
         const loadKakaoMapScript = () => {
@@ -327,6 +357,29 @@ function App() {
         };
     }, [mapId]);
 
+    const handleBusNumberSelect = (n: number) => {
+        try {
+            const idx = n - 1;
+            const bus = buses[idx];
+            if (bus && Number.isFinite(bus.lat) && Number.isFinite(bus.lng)) {
+                moveToLocation(bus.lat, bus.lng);
+                // Use the existing `Bubble` component to render the styled bubble
+                try {
+                    const label = `셔틀버스(${String(bus.direction)} 방향)`;
+                    setBubbleStop({ lat: bus.lat, lng: bus.lng, name: label });
+                } catch {
+                    /* ignore */
+                }
+            } else {
+                // eslint-disable-next-line no-console
+                console.warn(`No bus data for number ${n}`);
+            }
+        } catch (err) {
+            // eslint-disable-next-line no-console
+            console.error(err);
+        }
+    };
+
     return (
         <div
             className="App"
@@ -354,6 +407,7 @@ function App() {
                 <BusStops
                     busStops={busStops}
                     onSelect={(stop) => moveToLocation(stop.lat, stop.lng)}
+                    onBusNumberSelect={handleBusNumberSelect}
                     onToggleBubble={(stop) => {
                         // Always show the bubble for the selected stop.
                         // Do not toggle it off when the same stop is clicked again.

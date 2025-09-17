@@ -50,8 +50,6 @@ export default function BusStops({
 
     const handleNumberClick = (n: number) => {
         if (onBusNumberSelect) onBusNumberSelect(n);
-        // eslint-disable-next-line no-console
-        console.log(`Selected bus number: ${n}`);
     };
 
     return (
