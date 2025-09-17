@@ -230,7 +230,7 @@ function App() {
 
                 const img = document.createElement("img");
                 img.src = "/ic_busfront.svg";
-                img.alt = bus.name || "bus";
+                img.alt = bus.shuttleId || "bus";
                 img.style.width = "32px";
                 img.style.height = "32px";
                 img.style.display = "block";

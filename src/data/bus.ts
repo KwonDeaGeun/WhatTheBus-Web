@@ -1,6 +1,5 @@
 export interface Bus {
-    id: number;
-    name: string;
+    shuttleId: string;
     lat: number;
     lng: number;
     direction: string|null;
@@ -8,36 +7,31 @@ export interface Bus {
 
 export const buses: ReadonlyArray<Bus> = [
     {
-        id: 1,
-        name: "bus1",
+        shuttleId: "bus1",
         lat: 37.323494,
         lng: 127.123008,
         direction: null,
     },
     {
-        id: 2,
-        name: "bus2",
+        shuttleId: "bus2",
         lat: 37.323637,
         lng: 127.120047,
         direction: "단국대학교",
     },
     {
-        id: 3,
-        name: "bus3",
+        shuttleId: "bus3",
         lat: 37.323779,
         lng: 127.117087,
         direction: "죽전역",
     },
     {
-        id: 4,
-        name: "bus4",
+        shuttleId: "bus4",
         lat: 37.323921,
         lng: 127.114126,
         direction: "단국대학교",
     },
     {
-        id: 5,
-        name: "bus5",
+        shuttleId: "bus5",
         lat: 37.324063,
         lng: 127.111166,
         direction: "죽전역",
