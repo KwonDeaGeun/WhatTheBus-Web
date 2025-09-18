@@ -25,18 +25,19 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                     onClose();
                 }
             }}
-            style={{
-                position: "fixed",
-                top: 0,
-                right: 0,
-                bottom: 0,
-                zIndex: 10000,
-                background: "white",
-                padding: 20,
-                width: "min(420px, 70vw)",
-                boxShadow: "-8px 0 24px rgba(0,0,0,0.12)",
-                overflowY: "auto",
-            }}
+                style={{
+                    position: "fixed",
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    zIndex: 10000,
+                    background: "white",
+                    padding: 20,
+                    paddingTop: 40,
+                    width: "min(420px, 70vw)",
+                    boxShadow: "-8px 0 24px rgba(0,0,0,0.12)",
+                    overflowY: "auto",
+                }}
         >
             <div
                 style={{

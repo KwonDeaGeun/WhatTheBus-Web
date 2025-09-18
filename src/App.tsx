@@ -1,8 +1,10 @@
 import { Settings, X } from "lucide-react";
-import { useCallback, useEffect, useId, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useId, useState } from "react";
 import Bubble from "./components/Bubble";
 import BusStops from "./components/BusStops";
-import SettingsPanel from "./components/SettingsPanel";
+
+const SettingsPanel = lazy(() => import("./components/SettingsPanel"));
+
 import { useToast } from "./components/ui/use-toast";
 import { buses } from "./data/bus";
 import { busStops } from "./data/busStops";
@@ -10,10 +12,22 @@ import { busStops } from "./data/busStops";
 function App() {
     const mapId = useId();
     const langId = useId();
-    const [language, setLanguage] = useState("ko");
+    // 초기화 시 로컬 저장값 우선
+    const [language, setLanguage] = useState(
+        () => localStorage.getItem("wtb:lang") ?? "ko"
+    );
     const { toast } = useToast();
     const [showSettings, setShowSettings] = useState(false);
     const toggleSettings = useCallback(() => setShowSettings((s) => !s), []);
+
+    // 변경 시 반영
+    useEffect(() => {
+        try {
+            localStorage.setItem("wtb:lang", language);
+        } catch {
+            /* ignore */
+        }
+    }, [language]);
 
     type OverlayHandle = { setMap: (m: unknown) => void };
 
@@ -414,10 +428,12 @@ function App() {
             <button
                 type="button"
                 aria-label="설정"
+                aria-haspopup="dialog"
+                aria-expanded={showSettings}
                 onClick={toggleSettings}
                 style={{
                     position: "fixed",
-                    top: 12,
+                    top: 40,
                     right: 12,
                     zIndex: 10000,
                     background: "white",
@@ -431,16 +447,18 @@ function App() {
                     cursor: "pointer",
                 }}
             >
-                {showSettings ? <X size={18} /> : <Settings size={24} />}
+                {showSettings ? <X size={20} /> : <Settings size={20} />}
             </button>
 
             {showSettings ? (
-                <SettingsPanel
-                    langId={langId}
-                    language={language}
-                    setLanguage={setLanguage}
-                    onClose={toggleSettings}
-                />
+                <Suspense fallback={null}>
+                    <SettingsPanel
+                        langId={langId}
+                        language={language}
+                        setLanguage={setLanguage}
+                        onClose={() => setShowSettings(false)}
+                    />
+                </Suspense>
             ) : null}
             <div id={mapId} style={{ height: "70vh", width: "100vw" }} />
             <Bubble
@@ -462,9 +480,7 @@ function App() {
                     onSelect={(stop) => moveToLocation(stop.lat, stop.lng)}
                     onBusNumberSelect={handleBusNumberSelect}
                     onToggleBubble={(stop) => {
-                        // Always show the bubble for the selected stop.
-                        // Do not toggle it off when the same stop is clicked again.
-                        setBubbleStop(stop);
+                        setBubbleStop((prev) => (prev === stop ? undefined : stop));
                     }}
                 />
             </div>
