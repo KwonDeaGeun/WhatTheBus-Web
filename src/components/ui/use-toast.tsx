@@ -15,7 +15,7 @@ type ToastOptions = {
 
 type ToastMessage = ToastOptions & {
     id: number;
-    timeoutId: NodeJS.Timeout;
+    timeoutId: ReturnType<typeof setTimeout>;
 };
 
 type ToastContextValue = {
