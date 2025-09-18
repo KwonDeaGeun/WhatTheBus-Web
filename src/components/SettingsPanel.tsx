@@ -17,6 +17,14 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         <div
             role="dialog"
             aria-label="설정 패널"
+            aria-modal="true"
+            tabIndex={-1}
+            onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                    e.stopPropagation();
+                    onClose();
+                }
+            }}
             style={{
                 position: "fixed",
                 top: 0,
