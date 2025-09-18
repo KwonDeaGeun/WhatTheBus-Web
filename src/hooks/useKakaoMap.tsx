@@ -15,6 +15,14 @@ export function useKakaoMap(mapId: string, toast?: ToastFn) {
 
     useEffect(() => {
         const kakaoApiKey = import.meta.env.VITE_KAKAO_MAP_API_KEY;
+        if (!kakaoApiKey) {
+            toast?.({
+                title: "환경 설정 오류",
+                description: "카카오 맵 키가 설정되지 않았습니다.",
+                variant: "destructive",
+            });
+            return;
+        }
         const overlays: OverlayHandle[] = [];
 
         let mapInitialized = false;
@@ -203,8 +211,10 @@ export function useKakaoMap(mapId: string, toast?: ToastFn) {
             window.__currentBubbleOverlay = undefined;
             window.__currentBubbleStopName = undefined;
             window.map = undefined;
-            if (typeof panAnimationRef.current === "number")
+            if (typeof panAnimationRef.current === "number") {
                 cancelAnimationFrame(panAnimationRef.current);
+                panAnimationRef.current = undefined;
+            }
         };
     }, [mapId, toast]);
 
@@ -259,11 +269,9 @@ export function useKakaoMap(mapId: string, toast?: ToastFn) {
         const startLat = start.lat;
         const startLng = start.lng;
 
-        try {
-            if (typeof window.__panAnimationId === "number")
-                cancelAnimationFrame(window.__panAnimationId);
-        } catch {
-            /* ignore */
+        if (typeof panAnimationRef.current === "number") {
+            cancelAnimationFrame(panAnimationRef.current);
+            panAnimationRef.current = undefined;
         }
 
         const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
@@ -283,17 +291,13 @@ export function useKakaoMap(mapId: string, toast?: ToastFn) {
             }
 
             if (t < 1) {
-                window.__panAnimationId = requestAnimationFrame(step);
+                panAnimationRef.current = requestAnimationFrame(step);
             } else {
-                try {
-                    window.__panAnimationId = undefined;
-                } catch {
-                    /* ignore */
-                }
+                panAnimationRef.current = undefined;
             }
         };
 
-        window.__panAnimationId = requestAnimationFrame(step);
+        panAnimationRef.current = requestAnimationFrame(step);
     };
 
     return { moveToLocation };
