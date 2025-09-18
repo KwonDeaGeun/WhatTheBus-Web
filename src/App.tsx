@@ -1,11 +1,13 @@
 import { useEffect, useId, useState } from "react";
 import Bubble from "./components/Bubble";
 import BusStops from "./components/BusStops";
+import { useToast } from "./components/ui/use-toast";
 import { buses } from "./data/bus";
 import { busStops } from "./data/busStops";
 
 function App() {
     const mapId = useId();
+    const { toast } = useToast();
 
     type OverlayHandle = { setMap: (m: unknown) => void };
 
@@ -265,9 +267,20 @@ function App() {
                         window.kakao.maps.load(initMap);
                     };
                     script.onerror = () => {
-                        console.error(
-                            "Kakao Maps API 스크립트를 로드하는데 실패했습니다."
-                        );
+                        try {
+                            toast({
+                                title: "지도 로드 실패",
+                                description:
+                                    "Kakao Maps API 스크립트를 불러오는 데 실패했습니다.",
+                                variant: "destructive",
+                            });
+                        } catch {
+                            // fallback to console
+                            // eslint-disable-next-line no-console
+                            console.error(
+                                "Kakao Maps API 스크립트를 로드하는데 실패했습니다."
+                            );
+                        }
                     };
                 }
                 return;
@@ -285,9 +298,12 @@ function App() {
             };
 
             script.onerror = () => {
-                console.error(
-                    "Kakao Maps API 스크립트를 로드하는데 실패했습니다."
-                );
+                toast({
+                    title: "지도 로드 실패",
+                    description:
+                        "Kakao Maps API 스크립트를 불러오는 데 실패했습니다.",
+                    variant: "destructive",
+                });
             };
         };
 
@@ -355,7 +371,7 @@ function App() {
             window.__currentBubbleStopName = undefined;
             window.map = undefined;
         };
-    }, [mapId]);
+    }, [mapId, toast]);
 
     const handleBusNumberSelect = (n: number) => {
         try {

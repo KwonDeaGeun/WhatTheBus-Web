@@ -2,7 +2,7 @@ export interface Bus {
     shuttleId: string;
     lat: number;
     lng: number;
-    direction: string|null;
+    direction: string | null;
 }
 
 export const buses: ReadonlyArray<Bus> = [
