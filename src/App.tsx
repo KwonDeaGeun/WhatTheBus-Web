@@ -1,13 +1,19 @@
-import { useEffect, useId, useState } from "react";
+import { Settings, X } from "lucide-react";
+import { useCallback, useEffect, useId, useState } from "react";
 import Bubble from "./components/Bubble";
 import BusStops from "./components/BusStops";
+import SettingsPanel from "./components/SettingsPanel";
 import { useToast } from "./components/ui/use-toast";
 import { buses } from "./data/bus";
 import { busStops } from "./data/busStops";
 
 function App() {
     const mapId = useId();
+    const langId = useId();
+    const [language, setLanguage] = useState("ko");
     const { toast } = useToast();
+    const [showSettings, setShowSettings] = useState(false);
+    const toggleSettings = useCallback(() => setShowSettings((s) => !s), []);
 
     type OverlayHandle = { setMap: (m: unknown) => void };
 
@@ -405,6 +411,37 @@ function App() {
                 height: "100vh",
             }}
         >
+            <button
+                type="button"
+                aria-label="설정"
+                onClick={toggleSettings}
+                style={{
+                    position: "fixed",
+                    top: 12,
+                    right: 12,
+                    zIndex: 10000,
+                    background: "white",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: 8,
+                    padding: 8,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                    cursor: "pointer",
+                }}
+            >
+                {showSettings ? <X size={18} /> : <Settings size={18} />}
+            </button>
+
+            {showSettings ? (
+                <SettingsPanel
+                    langId={langId}
+                    language={language}
+                    setLanguage={setLanguage}
+                    onClose={toggleSettings}
+                />
+            ) : null}
             <div id={mapId} style={{ height: "70vh", width: "100vw" }} />
             <Bubble
                 stop={bubbleStop}
