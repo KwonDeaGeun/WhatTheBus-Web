@@ -431,7 +431,7 @@ function App() {
                     cursor: "pointer",
                 }}
             >
-                {showSettings ? <X size={18} /> : <Settings size={18} />}
+                {showSettings ? <X size={18} /> : <Settings size={24} />}
             </button>
 
             {showSettings ? (
