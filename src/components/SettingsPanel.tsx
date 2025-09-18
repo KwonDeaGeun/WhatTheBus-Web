@@ -33,7 +33,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 zIndex: 10000,
                 background: "white",
                 padding: 20,
-                width: "50%",
+                width: "min(420px, 70vw)",
                 boxShadow: "-8px 0 24px rgba(0,0,0,0.12)",
                 overflowY: "auto",
             }}
