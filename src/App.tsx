@@ -12,10 +12,15 @@ import { busStops } from "./data/busStops";
 function App() {
     const mapId = useId();
     const langId = useId();
-    // 초기화 시 로컬 저장값 우선
-    const [language, setLanguage] = useState(
-        () => localStorage.getItem("wtb:lang") ?? "ko"
-    );
+    const [language, setLanguage] = useState(() => {
+        try {
+            return typeof window !== "undefined" && window.localStorage
+                ? localStorage.getItem("wtb:lang") ?? "ko"
+                : "ko";
+        } catch {
+            return "ko";
+        }
+    });
     const { toast } = useToast();
     const [showSettings, setShowSettings] = useState(false);
     const toggleSettings = useCallback(() => setShowSettings((s) => !s), []);
@@ -23,7 +28,9 @@ function App() {
     // 변경 시 반영
     useEffect(() => {
         try {
-            localStorage.setItem("wtb:lang", language);
+            if (localStorage.getItem("wtb:lang") !== language) {
+                localStorage.setItem("wtb:lang", language);
+            }
         } catch {
             /* ignore */
         }
