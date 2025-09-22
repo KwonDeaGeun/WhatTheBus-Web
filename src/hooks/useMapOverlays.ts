@@ -1,20 +1,11 @@
 import { useEffect } from "react";
-import { createBusOverlays, createBusStopOverlays } from "../utils/mapOverlays";
-
-interface BusStop {
-    lat: number;
-    lng: number;
-}
-
-interface Bus {
-    lat: number;
-    lng: number;
-    shuttleId?: string;
-}
-
-interface OverlayHandle {
-    setMap: (map: unknown) => void;
-}
+import type { Bus } from "../data/bus";
+import type { BusStop } from "../data/busStops";
+import {
+    createBusOverlays,
+    createBusStopOverlays,
+    type OverlayHandle,
+} from "../utils/mapOverlays";
 
 export const useMapOverlays = (
     map: unknown,

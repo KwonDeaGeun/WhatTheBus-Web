@@ -1,15 +1,7 @@
-interface BusStop {
-    lat: number;
-    lng: number;
-}
+import type { Bus } from "../data/bus";
+import type { BusStop } from "../data/busStops";
 
-interface Bus {
-    lat: number;
-    lng: number;
-    shuttleId?: string;
-}
-
-interface OverlayHandle {
+export interface OverlayHandle {
     setMap: (map: unknown) => void;
 }
 
