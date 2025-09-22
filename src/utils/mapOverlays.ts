@@ -9,7 +9,7 @@ export const createBusStopOverlays = (
     map: unknown,
     busStops: BusStop[]
 ): OverlayHandle[] => {
-    if (!map || !window.kakao?.maps) return [];
+    if (!map || typeof window === "undefined" || !window.kakao?.maps) return [];
 
     return busStops.map((stop) => {
         const busIconDiv = document.createElement("div");
@@ -18,8 +18,14 @@ export const createBusStopOverlays = (
         busIconDiv.style.display = "flex";
         busIconDiv.style.alignItems = "center";
         busIconDiv.style.justifyContent = "center";
-        busIconDiv.innerHTML =
-            '<img src="/ic_busstop.svg" alt="Bus Icon" width="48" height="48" />';
+        const stopImg = document.createElement("img");
+        stopImg.src = "/ic_busstop.svg";
+        stopImg.alt = `정류장: ${stop.name}`;
+        stopImg.width = 48;
+        stopImg.height = 48;
+        stopImg.decoding = "async";
+        stopImg.style.display = "block";
+        busIconDiv.appendChild(stopImg);
 
         const markerPosition = new window.kakao.maps.LatLng(stop.lat, stop.lng);
         const overlay = new window.kakao.maps.CustomOverlay({
@@ -37,7 +43,7 @@ export const createBusOverlays = (
     map: unknown,
     buses: Bus[]
 ): OverlayHandle[] => {
-    if (!map || !window.kakao?.maps) return [];
+    if (!map || typeof window === "undefined" || !window.kakao?.maps) return [];
 
     return buses.map((bus) => {
         const busDiv = document.createElement("div");
