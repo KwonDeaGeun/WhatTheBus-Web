@@ -6,13 +6,21 @@ import BusStops from "./components/BusStops";
 const SettingsPanel = lazy(() => import("./components/SettingsPanel"));
 
 import { QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useToast } from "./components/ui/use-toast";
 import { buses } from "./data/bus";
 import { busStops } from "./data/busStops";
 import { useBusSelection } from "./hooks/useBusSelection";
 import { moveToLocation } from "./hooks/useMapMovement";
 import { queryClient } from "./lib/query-client";
+
+// Conditionally load ReactQueryDevtools only in development
+const ReactQueryDevtools = import.meta.env.DEV
+    ? lazy(() =>
+          import("@tanstack/react-query-devtools").then((module) => ({
+              default: module.ReactQueryDevtools,
+          }))
+      )
+    : () => null;
 
 function App() {
     const mapId = useId();
@@ -386,7 +394,11 @@ function App() {
                     />
                 </div>
             </div>
-            <ReactQueryDevtools initialIsOpen={false} />
+            {import.meta.env.DEV && (
+                <Suspense fallback={null}>
+                    <ReactQueryDevtools initialIsOpen={false} />
+                </Suspense>
+            )}
         </QueryClientProvider>
     );
 }

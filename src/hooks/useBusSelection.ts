@@ -1,11 +1,10 @@
+import type { Dispatch, SetStateAction } from "react";
 import { buses } from "../data/bus";
 import { moveToLocation } from "./useMapMovement";
 
 export const useBusSelection = (
-    setBubbleStop: React.Dispatch<
-        React.SetStateAction<
-            { lat: number; lng: number; name: string } | undefined
-        >
+    setBubbleStop: Dispatch<
+        SetStateAction<{ lat: number; lng: number; name: string } | undefined>
     >
 ) => {
     const handleBusNumberSelect = (n: number) => {

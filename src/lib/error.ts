@@ -8,7 +8,12 @@ export interface ApiErrorResponse {
 
 export const handleApiError = async (error: unknown): Promise<string> => {
     if (error instanceof HTTPError) {
-        const errorData = (await error.response.json()) as ApiErrorResponse;
+        let errorData: ApiErrorResponse | undefined;
+        try {
+            errorData = (await error.response.json()) as ApiErrorResponse;
+        } catch {
+            errorData = undefined;
+        }
 
         if (errorData?.message) {
             return errorData.message;
