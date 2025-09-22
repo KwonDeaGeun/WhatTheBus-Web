@@ -8,6 +8,11 @@ const SettingsPanel = lazy(() => import("./components/SettingsPanel"));
 import { useToast } from "./components/ui/use-toast";
 import { buses } from "./data/bus";
 import { busStops } from "./data/busStops";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { queryClient } from "./lib/query-client";
+import { moveToLocation } from "./hooks/useMapMovement";
+import { useBusSelection } from "./hooks/useBusSelection";
 
 function App() {
     const mapId = useId();
@@ -38,102 +43,11 @@ function App() {
 
     type OverlayHandle = { setMap: (m: unknown) => void };
 
-    // Function to move map to specific location with smooth animation
-    const moveToLocation = (lat: number, lng: number) => {
-        if (!window.map || typeof window.kakao === "undefined") return;
-
-        // try to read current center in a few common shapes
-        const getCenterCoords = () => {
-            try {
-                const c = window.map?.getCenter?.();
-                if (!c) return null;
-                if (
-                    "getLat" in c &&
-                    typeof (c as { getLat?: unknown }).getLat === "function"
-                ) {
-                    // Kakao LatLng-like object with getLat/getLng
-                    return {
-                        lat: (c as { getLat: () => number }).getLat(),
-                        lng: (c as { getLng: () => number }).getLng(),
-                    };
-                }
-                if (
-                    "lat" in c &&
-                    typeof (c as { lat?: unknown }).lat === "number"
-                ) {
-                    return {
-                        lat: (c as { lat: number }).lat,
-                        lng: (c as { lng: number }).lng,
-                    };
-                }
-            } catch {
-                /* ignore */
-            }
-            return null;
-        };
-
-        const start = getCenterCoords();
-        const targetLat = Number(lat);
-        const targetLng = Number(lng);
-
-        // if we can't read start center, jump immediately
-        if (!start) {
-            try {
-                window.map?.setCenter(
-                    new window.kakao.maps.LatLng(targetLat, targetLng)
-                );
-            } catch {
-                // ignore
-            }
-            return;
-        }
-
-        const duration = 500; // ms
-        const startTime = performance.now();
-        const startLat = start.lat;
-        const startLng = start.lng;
-
-        // cancel previous animation if any
-        try {
-            if (typeof window.__panAnimationId === "number")
-                cancelAnimationFrame(window.__panAnimationId);
-        } catch {
-            /* ignore */
-        }
-
-        const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
-
-        const step = (now: number) => {
-            const elapsed = now - startTime;
-            const t = Math.min(1, Math.max(0, elapsed / duration));
-            const eased = easeOutCubic(t);
-            const curLat = startLat + (targetLat - startLat) * eased;
-            const curLng = startLng + (targetLng - startLng) * eased;
-            try {
-                window.map?.setCenter(
-                    new window.kakao.maps.LatLng(curLat, curLng)
-                );
-            } catch {
-                /* ignore */
-            }
-
-            if (t < 1) {
-                window.__panAnimationId = requestAnimationFrame(step);
-            } else {
-                try {
-                    window.__panAnimationId = undefined;
-                } catch {
-                    /* ignore */
-                }
-            }
-        };
-
-        window.__panAnimationId = requestAnimationFrame(step);
-    };
-
     const [bubbleStop, setBubbleStop] = useState<
         { lat: number; lng: number; name: string } | undefined
     >(undefined);
+
+    const handleBusNumberSelect = useBusSelection(setBubbleStop);
 
     useEffect(() => {
         const kakaoApiKey = import.meta.env.VITE_KAKAO_MAP_API_KEY;
@@ -400,38 +314,16 @@ function App() {
         };
     }, [mapId, toast]);
 
-    const handleBusNumberSelect = (n: number) => {
-        try {
-            const idx = n - 1;
-            const bus = buses[idx];
-            if (bus && Number.isFinite(bus.lat) && Number.isFinite(bus.lng)) {
-                moveToLocation(bus.lat, bus.lng);
-                try {
-                    const dir = bus.direction?.trim() ?? "";
-                    const label = dir ? `셔틀버스(${dir} 방향)` : "셔틀버스";
-                    setBubbleStop({ lat: bus.lat, lng: bus.lng, name: label });
-                } catch {
-                    /* ignore */
-                }
-            } else {
-                // eslint-disable-next-line no-console
-                console.warn(`No bus data for number ${n}`);
-            }
-        } catch (err) {
-            // eslint-disable-next-line no-console
-            console.error(err);
-        }
-    };
-
     return (
-        <div
-            className="App"
-            style={{
-                display: "flex",
-                flexDirection: "column",
-                height: "100vh",
-            }}
-        >
+        <QueryClientProvider client={queryClient}>
+            <div
+                className="App"
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100vh",
+                }}
+            >
             <button
                 type="button"
                 aria-label="설정"
@@ -492,6 +384,8 @@ function App() {
                 />
             </div>
         </div>
+        <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
     );
 }
 
