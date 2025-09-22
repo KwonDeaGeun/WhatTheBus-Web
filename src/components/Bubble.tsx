@@ -97,25 +97,7 @@ export default function Bubble({ stop, onClose }: Props) {
                                     border: "none",
                                 }}
                             >
-                                <button
-                                    type="button"
-                                    aria-label="닫기"
-                                    onClick={(e) => {
-                                        try {
-                                            e.stopPropagation();
-                                        } catch {
-                                            /* ignore */
-                                        }
-                                        try {
-                                            if (overlay) overlay.setMap(null);
-                                        } catch {
-                                            /* ignore */
-                                        }
-                                        window.__currentBubbleOverlay = undefined;
-                                        window.__currentBubbleStopName = undefined;
-                                        if (onClose) onClose();
-                                    }}
-                                    style={{
+                                    <X size={32} style={{
                                         position: "absolute",
                                         right: 8,
                                         top: 8,
@@ -129,10 +111,7 @@ export default function Bubble({ stop, onClose }: Props) {
                                         padding: 0,
                                         borderRadius: 6,
                                         cursor: "pointer",
-                                    }}
-                                >
-                                    <X size={32} />
-                                </button>
+                                    }} />
                                 <div style={{ fontWeight: 600 }}>
                                     {displayName}
                                 </div>
