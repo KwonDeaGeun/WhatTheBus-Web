@@ -1,5 +1,5 @@
 import { Settings, X } from "lucide-react";
-import { lazy, Suspense, useCallback, useEffect, useId, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useId, useState, type ComponentType } from "react";
 import Bubble from "./components/Bubble";
 import BusStops from "./components/BusStops";
 
@@ -13,14 +13,18 @@ import { useBusSelection } from "./hooks/useBusSelection";
 import { moveToLocation } from "./hooks/useMapMovement";
 import { queryClient } from "./lib/query-client";
 
+interface DevtoolsProps {
+    initialIsOpen?: boolean;
+}
+
 // Conditionally load ReactQueryDevtools only in development
-const ReactQueryDevtools = import.meta.env.DEV
+const ReactQueryDevtools: ComponentType<DevtoolsProps> = import.meta.env.DEV
     ? lazy(() =>
           import("@tanstack/react-query-devtools").then((module) => ({
               default: module.ReactQueryDevtools,
           }))
       )
-    : () => null;
+    : (() => null) as ComponentType<DevtoolsProps>;
 
 function App() {
     const mapId = useId();
@@ -59,6 +63,14 @@ function App() {
 
     useEffect(() => {
         const kakaoApiKey = import.meta.env.VITE_KAKAO_MAP_API_KEY;
+        if (!kakaoApiKey) {
+            toast({
+                title: "환경설정 오류",
+                description: "Kakao Maps API 키가 설정되지 않았습니다.",
+                variant: "destructive",
+            });
+            return;
+        }
         const overlays: OverlayHandle[] = [];
 
         let mapInitialized = false;
