@@ -3,7 +3,9 @@ import { moveToLocation } from "./useMapMovement";
 
 export const useBusSelection = (
     setBubbleStop: React.Dispatch<
-        React.SetStateAction<{ lat: number; lng: number; name: string } | undefined>
+        React.SetStateAction<
+            { lat: number; lng: number; name: string } | undefined
+        >
     >
 ) => {
     const handleBusNumberSelect = (n: number) => {

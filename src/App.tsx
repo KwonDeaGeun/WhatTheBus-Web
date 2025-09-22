@@ -5,14 +5,14 @@ import BusStops from "./components/BusStops";
 
 const SettingsPanel = lazy(() => import("./components/SettingsPanel"));
 
+import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useToast } from "./components/ui/use-toast";
 import { buses } from "./data/bus";
 import { busStops } from "./data/busStops";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { queryClient } from "./lib/query-client";
-import { moveToLocation } from "./hooks/useMapMovement";
 import { useBusSelection } from "./hooks/useBusSelection";
+import { moveToLocation } from "./hooks/useMapMovement";
+import { queryClient } from "./lib/query-client";
 
 function App() {
     const mapId = useId();
@@ -20,7 +20,7 @@ function App() {
     const [language, setLanguage] = useState(() => {
         try {
             return typeof window !== "undefined" && window.localStorage
-                ? localStorage.getItem("wtb:lang") ?? "ko"
+                ? (localStorage.getItem("wtb:lang") ?? "ko")
                 : "ko";
         } catch {
             return "ko";
@@ -324,68 +324,70 @@ function App() {
                     height: "100vh",
                 }}
             >
-            <button
-                type="button"
-                aria-label="설정"
-                aria-haspopup="dialog"
-                aria-expanded={showSettings}
-                onClick={toggleSettings}
-                style={{
-                    position: "fixed",
-                    top: 40,
-                    right: 12,
-                    zIndex: 10000,
-                    background: "white",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 8,
-                    padding: 8,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                    cursor: "pointer",
-                }}
-            >
-                {showSettings ? <X size={20} /> : <Settings size={20} />}
-            </button>
-
-            {showSettings ? (
-                <Suspense fallback={null}>
-                    <SettingsPanel
-                        langId={langId}
-                        language={language}
-                        setLanguage={setLanguage}
-                        onClose={() => setShowSettings(false)}
-                    />
-                </Suspense>
-            ) : null}
-            <div id={mapId} style={{ height: "70vh", width: "100vw" }} />
-            <Bubble
-                stop={bubbleStop}
-                onClose={() => setBubbleStop(undefined)}
-            />
-            <div
-                style={{
-                    padding: "10px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    backgroundColor: "#f5f5f5",
-                    borderTop: "1px solid #ddd",
-                }}
-            >
-                <BusStops
-                    busStops={busStops}
-                    onSelect={(stop) => moveToLocation(stop.lat, stop.lng)}
-                    onBusNumberSelect={handleBusNumberSelect}
-                    onToggleBubble={(stop) => {
-                        setBubbleStop((prev) => (prev === stop ? undefined : stop));
+                <button
+                    type="button"
+                    aria-label="설정"
+                    aria-haspopup="dialog"
+                    aria-expanded={showSettings}
+                    onClick={toggleSettings}
+                    style={{
+                        position: "fixed",
+                        top: 40,
+                        right: 12,
+                        zIndex: 10000,
+                        background: "white",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: 8,
+                        padding: 8,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                        cursor: "pointer",
                     }}
+                >
+                    {showSettings ? <X size={20} /> : <Settings size={20} />}
+                </button>
+
+                {showSettings ? (
+                    <Suspense fallback={null}>
+                        <SettingsPanel
+                            langId={langId}
+                            language={language}
+                            setLanguage={setLanguage}
+                            onClose={() => setShowSettings(false)}
+                        />
+                    </Suspense>
+                ) : null}
+                <div id={mapId} style={{ height: "70vh", width: "100vw" }} />
+                <Bubble
+                    stop={bubbleStop}
+                    onClose={() => setBubbleStop(undefined)}
                 />
+                <div
+                    style={{
+                        padding: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        backgroundColor: "#f5f5f5",
+                        borderTop: "1px solid #ddd",
+                    }}
+                >
+                    <BusStops
+                        busStops={busStops}
+                        onSelect={(stop) => moveToLocation(stop.lat, stop.lng)}
+                        onBusNumberSelect={handleBusNumberSelect}
+                        onToggleBubble={(stop) => {
+                            setBubbleStop((prev) =>
+                                prev === stop ? undefined : stop
+                            );
+                        }}
+                    />
+                </div>
             </div>
-        </div>
-        <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+            <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
     );
 }
 

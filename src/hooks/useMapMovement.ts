@@ -69,9 +69,7 @@ export const moveToLocation = (lat: number, lng: number) => {
         const curLat = startLat + (targetLat - startLat) * eased;
         const curLng = startLng + (targetLng - startLng) * eased;
         try {
-            window.map?.setCenter(
-                new window.kakao.maps.LatLng(curLat, curLng)
-            );
+            window.map?.setCenter(new window.kakao.maps.LatLng(curLat, curLng));
         } catch {
             /* ignore */
         }
