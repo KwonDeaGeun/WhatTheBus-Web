@@ -1,4 +1,4 @@
-import { BusFront } from "lucide-react";
+import { BusFront, X } from "lucide-react";
 import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 
@@ -64,7 +64,7 @@ export default function Bubble({ stop, onClose }: Props) {
                                 position: "fixed",
                                 top: "40px",
                                 left: "16px",
-                                right: "16px",
+                                right: "48px",
                                 zIndex: 200,
                                 display: "flex",
                                 justifyContent: "center",
@@ -97,6 +97,42 @@ export default function Bubble({ stop, onClose }: Props) {
                                     border: "none",
                                 }}
                             >
+                                <button
+                                    type="button"
+                                    aria-label="닫기"
+                                    onClick={(e) => {
+                                        try {
+                                            e.stopPropagation();
+                                        } catch {
+                                            /* ignore */
+                                        }
+                                        try {
+                                            if (overlay) overlay.setMap(null);
+                                        } catch {
+                                            /* ignore */
+                                        }
+                                        window.__currentBubbleOverlay = undefined;
+                                        window.__currentBubbleStopName = undefined;
+                                        if (onClose) onClose();
+                                    }}
+                                    style={{
+                                        position: "absolute",
+                                        right: 8,
+                                        top: 8,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        width: 32,
+                                        height: 32,
+                                        background: "transparent",
+                                        border: "none",
+                                        padding: 0,
+                                        borderRadius: 6,
+                                        cursor: "pointer",
+                                    }}
+                                >
+                                    <X size={32} />
+                                </button>
                                 <div style={{ fontWeight: 600 }}>
                                     {displayName}
                                 </div>
