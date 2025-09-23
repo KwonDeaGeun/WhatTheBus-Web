@@ -1,4 +1,4 @@
-import { BusFront } from "lucide-react";
+import { BusFront, X } from "lucide-react";
 import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 
@@ -48,7 +48,7 @@ export default function Bubble({ stop, onClose }: Props) {
                     el.style.position = "fixed";
                     el.style.top = "16px";
                     el.style.left = "16px";
-                    el.style.right = "16px";
+                    el.style.right = "48px";
                     el.style.marginLeft = "auto";
                     el.style.marginRight = "auto";
                     el.style.zIndex = "200";
@@ -64,7 +64,7 @@ export default function Bubble({ stop, onClose }: Props) {
                                 position: "fixed",
                                 top: "40px",
                                 left: "16px",
-                                right: "16px",
+                                right: "48px",
                                 zIndex: 200,
                                 display: "flex",
                                 justifyContent: "center",
@@ -97,6 +97,11 @@ export default function Bubble({ stop, onClose }: Props) {
                                     border: "none",
                                 }}
                             >
+                                    <X
+                                        aria-hidden
+   size={28}
+   style={{ position: "absolute", right: 8, top: 8, pointerEvents: "none" }}
+/>
                                 <div style={{ fontWeight: 600 }}>
                                     {displayName}
                                 </div>
