@@ -48,7 +48,7 @@ export default function Bubble({ stop, onClose }: Props) {
                     el.style.position = "fixed";
                     el.style.top = "16px";
                     el.style.left = "16px";
-                    el.style.right = "16px";
+                    el.style.right = "48px";
                     el.style.marginLeft = "auto";
                     el.style.marginRight = "auto";
                     el.style.zIndex = "200";
@@ -97,21 +97,11 @@ export default function Bubble({ stop, onClose }: Props) {
                                     border: "none",
                                 }}
                             >
-                                    <X size={32} style={{
-                                        position: "absolute",
-                                        right: 8,
-                                        top: 8,
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        width: 32,
-                                        height: 32,
-                                        background: "transparent",
-                                        border: "none",
-                                        padding: 0,
-                                        borderRadius: 6,
-                                        cursor: "pointer",
-                                    }} />
+                                    <X
+                                        aria-hidden
+   size={28}
+   style={{ position: "absolute", right: 8, top: 8, pointerEvents: "none" }}
+/>
                                 <div style={{ fontWeight: 600 }}>
                                     {displayName}
                                 </div>
