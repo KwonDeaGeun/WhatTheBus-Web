@@ -19,15 +19,17 @@ const createIconSVG = (iconType: "mapPin" | "bus") => {
     svg.style.display = "block";
 
     if (iconType === "mapPin") {
-        // MapPin icon path
+        // MapPin icon path with white fill
         const path1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
         path1.setAttribute("d", "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0");
+        path1.setAttribute("fill", "white");
         svg.appendChild(path1);
         
         const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         circle.setAttribute("cx", "12");
         circle.setAttribute("cy", "10");
         circle.setAttribute("r", "3");
+        circle.setAttribute("fill", "white");
         svg.appendChild(circle);
     } else {
         // Bus icon paths with white fill background
