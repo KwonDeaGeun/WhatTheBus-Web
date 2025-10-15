@@ -1,3 +1,4 @@
+import { ChevronDown } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { BusStop } from "../data/busStops";
 
@@ -53,18 +54,8 @@ export default function BusStops({
     };
 
     return (
-        <div
-            style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                width: "100%",
-                gap: 8,
-            }}
-        >
-            <div
-                style={{ display: "flex", alignItems: "center", width: "100%" }}
-            >
+        <div className="flex w-full flex-col items-start gap-3">
+            <div className="flex w-full flex-col items-start">
                 <button
                     aria-label="버스 정류장 목록 토글"
                     type="button"
@@ -78,46 +69,42 @@ export default function BusStops({
                             if (next) setOpenNumbers(false);
                         })
                     }
-                    style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 8,
-                        padding: "8px 12px",
-                        border: "none",
-                        background: "transparent",
-                        cursor: disabled ? "not-allowed" : "pointer",
-                        opacity: disabled ? 0.6 : 1,
-                    }}
+                    className="group inline-flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border-none bg-transparent px-4 py-3 transition-all duration-200 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                    <img
-                        src="/ic_busstop.svg"
-                        alt="버스 정류장"
-                        width={48}
-                        height={48}
+                    <div className="inline-flex items-center gap-3">
+                        <div className="flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                            <img
+                                src="/ic_busstop.svg"
+                                alt="버스 정류장"
+                                width={48}
+                                height={48}
+                                className="h-12 w-12"
+                            />
+                        </div>
+                        <span
+                            className={`font-semibold text-gray-800 text-lg transition-opacity duration-200 ${
+                                openStops ? "hidden" : "inline"
+                            }`}
+                        >
+                            버스 정류장 선택하기
+                        </span>
+                    </div>
+                    <ChevronDown
+                        className={`h-6 w-6 text-gray-600 transition-transform duration-300 ${
+                            openStops ? "rotate-180" : "rotate-0"
+                        }`}
                     />
-                    <span
-                        style={{
-                            color: "#333",
-                            fontSize: "16px",
-                            display: openStops ? "none" : "inline",
-                        }}
-                    >
-                        버스 정류장 선택하기
-                    </span>
                 </button>
 
                 <section
                     id={listId}
                     aria-label="버스 정류장 목록"
-                    style={{
-                        display: openStops ? "grid" : "none",
-                        gridTemplateColumns: "repeat(3, 1fr)",
-                        gap: "8px",
-                        width: "100%",
-                        marginTop: 8,
-                    }}
+                    className={`w-full origin-top transition-all duration-300 ease-in-out ${
+                        openStops
+                            ? "mt-2 grid scale-y-100 grid-cols-3 gap-3 opacity-100"
+                            : "hidden scale-y-0 opacity-0"
+                    }`}
                 >
-                    {/* 세 개 버튼: 죽전역, 치과병원, 정문 */}
                     {[
                         { name: "죽전역" },
                         { name: "치과병원" },
@@ -139,18 +126,7 @@ export default function BusStops({
                                     }
                                 })
                             }
-                            style={{
-                                padding: "16px 12px",
-                                minHeight: "48px",
-                                backgroundColor: "#007bff",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "4px",
-                                cursor: disabled ? "not-allowed" : "pointer",
-                                fontSize: "16px",
-                                fontWeight: "bold",
-                                opacity: disabled ? 0.6 : 1,
-                            }}
+                            className="hover:-translate-y-0.5 min-h-[56px] cursor-pointer rounded-xl border-none bg-blue-600 px-4 py-4 font-bold text-base text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none"
                         >
                             {stop.name}
                         </button>
@@ -158,9 +134,7 @@ export default function BusStops({
                 </section>
             </div>
 
-            <div
-                style={{ display: "flex", alignItems: "center", width: "100%" }}
-            >
+            <div className="flex w-full flex-col items-start">
                 <button
                     aria-label="버스 번호 선택 토글"
                     type="button"
@@ -174,45 +148,41 @@ export default function BusStops({
                             if (next) setOpenStops(false);
                         })
                     }
-                    style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 8,
-                        padding: "8px 12px",
-                        border: "none",
-                        background: "transparent",
-                        cursor: disabled ? "not-allowed" : "pointer",
-                        opacity: disabled ? 0.6 : 1,
-                    }}
+                    className="group inline-flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border-none bg-transparent px-4 py-3 transition-all duration-200 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                    <img
-                        src="/ic_busfront.svg"
-                        alt="버스"
-                        width={48}
-                        height={48}
+                    <div className="inline-flex items-center gap-3">
+                        <div className="flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                            <img
+                                src="/ic_busfront.svg"
+                                alt="버스"
+                                width={48}
+                                height={48}
+                                className="h-12 w-12"
+                            />
+                        </div>
+                        <span
+                            className={`font-semibold text-gray-800 text-lg transition-opacity duration-200 ${
+                                openNumbers ? "hidden" : "inline"
+                            }`}
+                        >
+                            버스 선택하기
+                        </span>
+                    </div>
+                    <ChevronDown
+                        className={`h-6 w-6 text-gray-600 transition-transform duration-300 ${
+                            openNumbers ? "rotate-180" : "rotate-0"
+                        }`}
                     />
-                    <span
-                        style={{
-                            color: "#333",
-                            fontSize: "16px",
-                            display: openNumbers ? "none" : "inline",
-                        }}
-                    >
-                        버스 선택하기
-                    </span>
                 </button>
 
                 <section
                     id={numbersId}
                     aria-label="버스 번호 선택"
-                    style={{
-                        display: openNumbers ? "grid" : "none",
-                        gridTemplateColumns: "repeat(3, 1fr)",
-                        gap: "8px",
-                        width: "100%",
-                        marginTop: 8,
-                        alignItems: "center",
-                    }}
+                    className={`w-full origin-top transition-all duration-300 ease-in-out ${
+                        openNumbers
+                            ? "mt-2 grid scale-y-100 grid-cols-3 gap-3 opacity-100"
+                            : "hidden scale-y-0 opacity-0"
+                    }`}
                 >
                     {[1, 2, 3, 4, 5].map((n) => (
                         <button
@@ -222,19 +192,7 @@ export default function BusStops({
                             onClick={() =>
                                 handleClick(() => handleNumberClick(n))
                             }
-                            style={{
-                                padding: "16px 12px",
-                                minHeight: "48px",
-                                backgroundColor: "#007bff",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "4px",
-                                cursor: disabled ? "not-allowed" : "pointer",
-                                fontSize: "16px",
-                                fontWeight: "bold",
-                                transition: "background-color 0.15s ease",
-                                opacity: disabled ? 0.6 : 1,
-                            }}
+                            className="hover:-translate-y-0.5 min-h-[56px] cursor-pointer rounded-xl border-none bg-blue-600 px-4 py-4 font-bold text-base text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none"
                         >
                             {n}
                         </button>

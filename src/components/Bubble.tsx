@@ -97,11 +97,16 @@ export default function Bubble({ stop, onClose }: Props) {
                                     border: "none",
                                 }}
                             >
-                                    <X
-                                        aria-hidden
-   size={28}
-   style={{ position: "absolute", right: 8, top: 8, pointerEvents: "none" }}
-/>
+                                <X
+                                    aria-hidden
+                                    size={28}
+                                    style={{
+                                        position: "absolute",
+                                        right: 8,
+                                        top: 8,
+                                        pointerEvents: "none",
+                                    }}
+                                />
                                 <div style={{ fontWeight: 600 }}>
                                     {displayName}
                                 </div>
