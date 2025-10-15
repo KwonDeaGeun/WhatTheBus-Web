@@ -99,10 +99,10 @@ export default function BusStops({
                 <section
                     id={listId}
                     aria-label="버스 정류장 목록"
-                    className={`w-full origin-top transition-all duration-300 ease-in-out ${
+                    className={`grid w-full origin-top grid-cols-3 gap-3 overflow-hidden transition-[opacity,transform,max-height,margin] duration-300 ease-in-out ${
                         openStops
-                            ? "mt-2 grid scale-y-100 grid-cols-3 gap-3 opacity-100"
-                            : "hidden scale-y-0 opacity-0"
+                            ? "mt-2 max-h-[640px] scale-y-100 opacity-100"
+                            : "max-h-0 scale-y-0 opacity-0"
                     }`}
                 >
                     {[
