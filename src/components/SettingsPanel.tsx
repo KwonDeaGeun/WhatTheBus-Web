@@ -125,7 +125,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                     </div>
                     <div style={{ fontSize: 15, color: "#374151" }}>
                         <a
-                            href="https://www.notion.so/your-notion-page"
+                            href="https://www.notion.so/What-The-Bus-28de74f7e03580479307d7533f1ecc0a"
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{ color: "#0ea5e9", textDecoration: "none" }}
