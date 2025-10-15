@@ -44,7 +44,7 @@ export const useKakaoMap = ({ mapId, toast }: UseKakaoMapOptions) => {
 
             const map = new window.kakao.maps.Map(container, options);
             map.setMinLevel(3);
-            map.setMaxLevel(4);
+            map.setMaxLevel(5);
             map.setZoomable(true);
 
             window.map = map;
