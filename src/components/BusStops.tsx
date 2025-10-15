@@ -69,7 +69,7 @@ export default function BusStops({
                             if (next) setOpenNumbers(false);
                         })
                     }
-                    className="group inline-flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border-none bg-transparent px-4 py-3 transition-all duration-200 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="group inline-flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border-0 bg-transparent px-4 py-3 transition-all duration-200 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     <div className="inline-flex items-center gap-3">
                         <div className="flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
@@ -126,7 +126,7 @@ export default function BusStops({
                                     }
                                 })
                             }
-                            className="hover:-translate-y-0.5 min-h-[56px] cursor-pointer rounded-xl border-none bg-blue-600 px-4 py-4 font-bold text-base text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                            className="hover:-translate-y-0.5 min-h-[56px] cursor-pointer rounded-xl border-0 bg-blue-600 px-4 py-4 font-bold text-base text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none"
                         >
                             {stop.name}
                         </button>
@@ -148,7 +148,7 @@ export default function BusStops({
                             if (next) setOpenStops(false);
                         })
                     }
-                    className="group inline-flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border-none bg-transparent px-4 py-3 transition-all duration-200 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="group inline-flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border-0 bg-transparent px-4 py-3 transition-all duration-200 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     <div className="inline-flex items-center gap-3">
                         <div className="flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
@@ -192,7 +192,7 @@ export default function BusStops({
                             onClick={() =>
                                 handleClick(() => handleNumberClick(n))
                             }
-                            className="hover:-translate-y-0.5 min-h-[56px] cursor-pointer rounded-xl border-none bg-blue-600 px-4 py-4 font-bold text-base text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                            className="hover:-translate-y-0.5 min-h-[56px] cursor-pointer rounded-xl border-0 bg-blue-600 px-4 py-4 font-bold text-base text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none"
                         >
                             {n}
                         </button>
