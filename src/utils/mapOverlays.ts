@@ -8,8 +8,8 @@ export interface OverlayHandle {
 // Helper to create Lucide icon as SVG element
 const createIconSVG = (iconType: "mapPin" | "bus") => {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("width", "48");
-    svg.setAttribute("height", "48");
+    svg.setAttribute("width", "32");
+    svg.setAttribute("height", "32");
     svg.setAttribute("viewBox", "0 0 24 24");
     svg.setAttribute("fill", "none");
     svg.setAttribute("stroke", "#2563eb"); // text-blue-600
