@@ -1,4 +1,4 @@
-import { ChevronDown } from "lucide-react";
+import { Bus, ChevronDown, MapPin } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { BusStop } from "../data/busStops";
 
@@ -73,13 +73,7 @@ export default function BusStops({
                 >
                     <div className="inline-flex items-center gap-3">
                         <div className="flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
-                            <img
-                                src="/ic_busstop.svg"
-                                alt="버스 정류장"
-                                width={48}
-                                height={48}
-                                className="h-12 w-12"
-                            />
+                            <MapPin className="h-8 w-8 text-blue-600" strokeWidth={2.5} />
                         </div>
                         <span
                             className={`font-semibold text-gray-800 text-lg transition-opacity duration-200 ${
@@ -152,13 +146,7 @@ export default function BusStops({
                 >
                     <div className="inline-flex items-center gap-3">
                         <div className="flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
-                            <img
-                                src="/ic_busfront.svg"
-                                alt="버스"
-                                width={48}
-                                height={48}
-                                className="h-12 w-12"
-                            />
+                            <Bus className="h-8 w-8 text-blue-600" strokeWidth={2.5} />
                         </div>
                         <span
                             className={`font-semibold text-gray-800 text-lg transition-opacity duration-200 ${
