@@ -1,8 +1,9 @@
 import type { Dispatch, SetStateAction } from "react";
-import { buses } from "../data/bus";
+import type { Bus } from "../data/bus";
 import { moveToLocation } from "./useMapMovement";
 
 export const useBusSelection = (
+    buses: Bus[],
     setBubbleStop: Dispatch<
         SetStateAction<{ lat: number; lng: number; name: string } | undefined>
     >
@@ -14,8 +15,8 @@ export const useBusSelection = (
             if (bus && Number.isFinite(bus.lat) && Number.isFinite(bus.lng)) {
                 moveToLocation(bus.lat, bus.lng);
                 try {
-                    const dir = bus.direction?.trim() ?? "";
-                    const label = dir ? `셔틀버스(${dir} 방향)` : "셔틀버스";
+                    const direction = bus.direction === true ? "단국대학교" : bus.direction === false ? "죽전역" : "";
+                    const label = direction ? `셔틀버스(${direction} 방향)` : "셔틀버스";
                     setBubbleStop({ lat: bus.lat, lng: bus.lng, name: label });
                 } catch {
                     /* ignore */
