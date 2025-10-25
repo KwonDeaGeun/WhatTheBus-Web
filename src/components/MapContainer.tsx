@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { buses } from "../data/bus";
+import { useBusLocations } from "../api/bus";
 import { busStops } from "../data/busStops";
 import { useKakaoMap } from "../hooks/useKakaoMap";
 import { useMapEventHandlers } from "../hooks/useMapEventHandlers";
@@ -14,8 +14,9 @@ interface MapContainerProps {
 export const MapContainer = ({ mapId, children }: MapContainerProps) => {
     const { toast } = useToast();
     const map = useKakaoMap({ mapId, toast });
+    const { data: buses = [] } = useBusLocations();
 
-    useMapOverlays(map, [...busStops], [...buses]);
+    useMapOverlays(map, [...busStops], buses);
     useMapEventHandlers(mapId);
 
     return (

@@ -15,6 +15,7 @@ import { SettingsButton } from "./components/SettingsButton";
 const SettingsPanel = lazy(() => import("./components/SettingsPanel"));
 
 import { QueryClientProvider } from "@tanstack/react-query";
+import { useBusLocations } from "./api/bus";
 import { useBusSelection } from "./hooks/useBusSelection";
 import { queryClient } from "./lib/query-client";
 
@@ -22,7 +23,6 @@ interface DevtoolsProps {
     initialIsOpen?: boolean;
 }
 
-// Conditionally load ReactQueryDevtools only in development
 const ReactQueryDevtools: ComponentType<DevtoolsProps> = import.meta.env.DEV
     ? lazy(() =>
           import("@tanstack/react-query-devtools").then((module) => ({
@@ -61,54 +61,86 @@ function App() {
         { lat: number; lng: number; name: string } | undefined
     >(undefined);
 
-    const handleBusNumberSelect = useBusSelection(setBubbleStop);
-
     return (
         <QueryClientProvider client={queryClient}>
-            <div
-                className="App"
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    height: "100vh",
-                }}
-            >
-                <SettingsButton
-                    showSettings={showSettings}
-                    onToggle={toggleSettings}
-                />
-
-                {showSettings ? (
-                    <Suspense fallback={null}>
-                        <SettingsPanel
-                            langId={langId}
-                            language={language}
-                            setLanguage={setLanguage}
-                            onClose={() => setShowSettings(false)}
-                        />
-                    </Suspense>
-                ) : null}
-                <MapContainer mapId={mapId}>
-                    <Bubble
-                        stop={bubbleStop}
-                        onClose={() => setBubbleStop(undefined)}
-                    />
-                </MapContainer>
-                <BusStopsPanel
-                    onBusNumberSelect={handleBusNumberSelect}
-                    onToggleBubble={(stop) => {
-                        setBubbleStop((prev) =>
-                            prev === stop ? undefined : stop
-                        );
-                    }}
-                />
-            </div>
-            {import.meta.env.DEV && (
-                <Suspense fallback={null}>
-                    <ReactQueryDevtools initialIsOpen={false} />
-                </Suspense>
-            )}
+            <AppContent
+                mapId={mapId}
+                langId={langId}
+                language={language}
+                setLanguage={setLanguage}
+                showSettings={showSettings}
+                toggleSettings={toggleSettings}
+                bubbleStop={bubbleStop}
+                setBubbleStop={setBubbleStop}
+            />
+            {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
         </QueryClientProvider>
+    );
+}
+
+interface AppContentProps {
+    mapId: string;
+    langId: string;
+    language: string;
+    setLanguage: (lang: string) => void;
+    showSettings: boolean;
+    toggleSettings: () => void;
+    bubbleStop: { lat: number; lng: number; name: string } | undefined;
+    setBubbleStop: React.Dispatch<React.SetStateAction<{ lat: number; lng: number; name: string } | undefined>>;
+}
+
+function AppContent({
+    mapId,
+    langId,
+    language,
+    setLanguage,
+    showSettings,
+    toggleSettings,
+    bubbleStop,
+    setBubbleStop,
+}: AppContentProps) {
+    const { data: buses = [] } = useBusLocations();
+    const handleBusNumberSelect = useBusSelection(buses, setBubbleStop);
+
+    return (
+        <div
+            className="App"
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                height: "100vh",
+            }}
+        >
+            <SettingsButton
+                showSettings={showSettings}
+                onToggle={toggleSettings}
+            />
+
+            {showSettings ? (
+                <Suspense fallback={null}>
+                    <SettingsPanel
+                        langId={langId}
+                        language={language}
+                        setLanguage={setLanguage}
+                        onClose={toggleSettings}
+                    />
+                </Suspense>
+            ) : null}
+            <MapContainer mapId={mapId}>
+                <Bubble
+                    stop={bubbleStop}
+                    onClose={() => setBubbleStop(undefined)}
+                />
+            </MapContainer>
+            <BusStopsPanel
+                onBusNumberSelect={handleBusNumberSelect}
+                onToggleBubble={(stop) => {
+                    setBubbleStop((prev) =>
+                        prev === stop ? undefined : stop
+                    );
+                }}
+            />
+        </div>
     );
 }
 
