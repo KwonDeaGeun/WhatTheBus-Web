@@ -3,6 +3,7 @@ import ky from "ky";
 const apiClient = ky.create({
     prefixUrl: import.meta.env.VITE_API_BASE_URL || "",
     timeout: 10000,
+    credentials: "include",
 });
 
 export const apiGet = async <T, P = undefined>(
