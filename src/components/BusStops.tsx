@@ -8,7 +8,6 @@ type Props = {
     onBusNumberSelect?: (n: number) => void;
     onToggleBubble?: (stop?: BusStop) => void;
     busCount?: number;
-    selectedStopName?: string;
 };
 
 export default function BusStops({

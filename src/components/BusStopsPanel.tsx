@@ -7,14 +7,12 @@ interface BusStopsPanelProps {
     onBusNumberSelect: (n: number) => void;
     onToggleBubble: (stop?: BusStop) => void;
     busCount: number;
-    selectedStopName?: string;
 }
 
 export const BusStopsPanel = ({
     onBusNumberSelect,
     onToggleBubble,
     busCount,
-    selectedStopName,
 }: BusStopsPanelProps) => {
     return (
         <div
@@ -33,7 +31,6 @@ export const BusStopsPanel = ({
                 onBusNumberSelect={onBusNumberSelect}
                 onToggleBubble={onToggleBubble}
                 busCount={busCount}
-                selectedStopName={selectedStopName}
             />
         </div>
     );

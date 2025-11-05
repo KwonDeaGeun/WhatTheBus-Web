@@ -144,7 +144,6 @@ function AppContent({
                     setBubbleStop((prev) => (prev === stop ? undefined : stop));
                 }}
                 busCount={buses.length}
-                selectedStopName={bubbleStop?.name}
             />
         </div>
     );
