@@ -119,26 +119,15 @@ export default function BusStops({
                             : "max-h-0 scale-y-0 opacity-0"
                     }`}
                 >
-                    {[
-                        { name: "죽전역" },
-                        { name: "치과병원" },
-                        { name: "정문" },
-                        { name: "평화의광장" },
-                    ].map((stop) => (
+                    {busStops.map((stop) => (
                         <button
                             key={stop.name}
                             type="button"
                             disabled={disabled}
                             onClick={() =>
                                 handleClick(() => {
-                                    const realStop = busStops.find(
-                                        (s) => s.name === stop.name
-                                    );
-                                    if (realStop) {
-                                        onSelect(realStop);
-                                        if (onToggleBubble)
-                                            onToggleBubble(realStop);
-                                    }
+                                    onSelect(stop);
+                                    if (onToggleBubble) onToggleBubble(stop);
                                 })
                             }
                             className="hover:-translate-y-0.5 min-h-[56px] cursor-pointer rounded-xl border-0 bg-blue-600 px-4 py-4 font-bold text-base text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none"
