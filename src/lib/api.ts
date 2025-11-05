@@ -5,7 +5,9 @@ const apiClient = ky.create({
     timeout: 10000,
     //credentials: "include",
     headers: {
-        ...(import.meta.env.VITE_API_KEY ? { "x-api-key": import.meta.env.VITE_API_KEY } : {}),
+        ...(import.meta.env.VITE_API_KEY
+            ? { "x-api-key": import.meta.env.VITE_API_KEY }
+            : {}),
     },
 });
 

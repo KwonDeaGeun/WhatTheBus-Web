@@ -9,14 +9,19 @@ import { useToast } from "./ui/use-toast";
 interface MapContainerProps {
     mapId: string;
     children?: ReactNode;
+    selectedStopName?: string;
 }
 
-export const MapContainer = ({ mapId, children }: MapContainerProps) => {
+export const MapContainer = ({
+    mapId,
+    children,
+    selectedStopName,
+}: MapContainerProps) => {
     const { toast } = useToast();
     const map = useKakaoMap({ mapId, toast });
     const { data: buses = [] } = useBusLocations();
 
-    useMapOverlays(map, [...busStops], buses);
+    useMapOverlays(map, [...busStops], buses, selectedStopName);
     useMapEventHandlers(mapId);
 
     return (

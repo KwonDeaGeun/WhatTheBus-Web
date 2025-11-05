@@ -10,13 +10,14 @@ import {
 export const useMapOverlays = (
     map: unknown,
     busStops: BusStop[],
-    buses: Bus[]
+    buses: Bus[],
+    selectedStopName?: string
 ) => {
     useEffect(() => {
         if (!map) return;
 
         const overlays: OverlayHandle[] = [
-            ...createBusStopOverlays(map, busStops),
+            ...createBusStopOverlays(map, busStops, selectedStopName),
             ...createBusOverlays(map, buses),
         ];
 
@@ -29,5 +30,5 @@ export const useMapOverlays = (
                 }
             });
         };
-    }, [map, busStops, buses]);
+    }, [map, busStops, buses, selectedStopName]);
 };
