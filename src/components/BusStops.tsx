@@ -1,4 +1,4 @@
-import { Bus, ChevronDown, MapPin } from "lucide-react";
+import { Bus, ChevronDown } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { BusStop } from "../data/busStops";
 
@@ -7,6 +7,7 @@ type Props = {
     onSelect: (stop: BusStop) => void;
     onBusNumberSelect?: (n: number) => void;
     onToggleBubble?: (stop?: BusStop) => void;
+    busCount?: number;
 };
 
 export default function BusStops({
@@ -14,6 +15,7 @@ export default function BusStops({
     onSelect,
     onBusNumberSelect,
     onToggleBubble,
+    busCount = 0,
 }: Props) {
     const [openStops, setOpenStops] = useState(false);
     const [openNumbers, setOpenNumbers] = useState(false);
@@ -73,7 +75,25 @@ export default function BusStops({
                 >
                     <div className="inline-flex items-center gap-3">
                         <div className="flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
-                            <MapPin className="h-8 w-8 text-blue-600" strokeWidth={2.5} />
+                            <svg
+                                width="32"
+                                height="32"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#2563eb"
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                role="img"
+                                aria-label="정류장 아이콘"
+                            >
+                                <title>정류장 아이콘</title>
+                                <path
+                                    d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
+                                    fill="#2563eb"
+                                />
+                                <circle cx="12" cy="10" r="3" fill="white" />
+                            </svg>
                         </div>
                         <span
                             className={`font-semibold text-gray-800 text-lg transition-opacity duration-200 ${
@@ -93,31 +113,21 @@ export default function BusStops({
                 <section
                     id={listId}
                     aria-label="버스 정류장 목록"
-                    className={`grid w-full origin-top grid-cols-3 gap-3 overflow-hidden transition-[opacity,transform,max-height,margin] duration-300 ease-in-out ${
+                    className={`grid w-full origin-top grid-cols-2 gap-3 overflow-hidden transition-[opacity,transform,max-height,margin] duration-300 ease-in-out ${
                         openStops
                             ? "mt-2 max-h-[640px] scale-y-100 opacity-100"
                             : "max-h-0 scale-y-0 opacity-0"
                     }`}
                 >
-                    {[
-                        { name: "죽전역" },
-                        { name: "치과병원" },
-                        { name: "정문" },
-                    ].map((stop) => (
+                    {busStops.map((stop) => (
                         <button
                             key={stop.name}
                             type="button"
                             disabled={disabled}
                             onClick={() =>
                                 handleClick(() => {
-                                    const realStop = busStops.find(
-                                        (s) => s.name === stop.name
-                                    );
-                                    if (realStop) {
-                                        onSelect(realStop);
-                                        if (onToggleBubble)
-                                            onToggleBubble(realStop);
-                                    }
+                                    onSelect(stop);
+                                    if (onToggleBubble) onToggleBubble(stop);
                                 })
                             }
                             className="hover:-translate-y-0.5 min-h-[56px] cursor-pointer rounded-xl border-0 bg-blue-600 px-4 py-4 font-bold text-base text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none"
@@ -146,7 +156,10 @@ export default function BusStops({
                 >
                     <div className="inline-flex items-center gap-3">
                         <div className="flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
-                            <Bus className="h-8 w-8 text-blue-600" strokeWidth={2.5} />
+                            <Bus
+                                className="h-8 w-8 text-blue-600"
+                                strokeWidth={2.5}
+                            />
                         </div>
                         <span
                             className={`font-semibold text-gray-800 text-lg transition-opacity duration-200 ${
@@ -172,19 +185,21 @@ export default function BusStops({
                             : "hidden scale-y-0 opacity-0"
                     }`}
                 >
-                    {[1, 2, 3, 4, 5].map((n) => (
-                        <button
-                            key={n}
-                            type="button"
-                            disabled={disabled}
-                            onClick={() =>
-                                handleClick(() => handleNumberClick(n))
-                            }
-                            className="hover:-translate-y-0.5 min-h-[56px] cursor-pointer rounded-xl border-0 bg-blue-600 px-4 py-4 font-bold text-base text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none"
-                        >
-                            {n}
-                        </button>
-                    ))}
+                    {Array.from({ length: busCount }, (_, i) => i + 1).map(
+                        (n) => (
+                            <button
+                                key={n}
+                                type="button"
+                                disabled={disabled}
+                                onClick={() =>
+                                    handleClick(() => handleNumberClick(n))
+                                }
+                                className="hover:-translate-y-0.5 min-h-[56px] cursor-pointer rounded-xl border-0 bg-blue-600 px-4 py-4 font-bold text-base text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                            >
+                                {n}
+                            </button>
+                        )
+                    )}
                 </section>
             </div>
         </div>

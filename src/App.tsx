@@ -73,7 +73,9 @@ function App() {
                 bubbleStop={bubbleStop}
                 setBubbleStop={setBubbleStop}
             />
-            {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+            {import.meta.env.DEV && (
+                <ReactQueryDevtools initialIsOpen={false} />
+            )}
         </QueryClientProvider>
     );
 }
@@ -86,7 +88,11 @@ interface AppContentProps {
     showSettings: boolean;
     toggleSettings: () => void;
     bubbleStop: { lat: number; lng: number; name: string } | undefined;
-    setBubbleStop: React.Dispatch<React.SetStateAction<{ lat: number; lng: number; name: string } | undefined>>;
+    setBubbleStop: React.Dispatch<
+        React.SetStateAction<
+            { lat: number; lng: number; name: string } | undefined
+        >
+    >;
 }
 
 function AppContent({
@@ -126,7 +132,7 @@ function AppContent({
                     />
                 </Suspense>
             ) : null}
-            <MapContainer mapId={mapId}>
+            <MapContainer mapId={mapId} selectedStopName={bubbleStop?.name}>
                 <Bubble
                     stop={bubbleStop}
                     onClose={() => setBubbleStop(undefined)}
@@ -135,10 +141,9 @@ function AppContent({
             <BusStopsPanel
                 onBusNumberSelect={handleBusNumberSelect}
                 onToggleBubble={(stop) => {
-                    setBubbleStop((prev) =>
-                        prev === stop ? undefined : stop
-                    );
+                    setBubbleStop((prev) => (prev === stop ? undefined : stop));
                 }}
+                busCount={buses.length}
             />
         </div>
     );

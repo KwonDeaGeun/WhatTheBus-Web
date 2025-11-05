@@ -6,11 +6,13 @@ import BusStops from "./BusStops";
 interface BusStopsPanelProps {
     onBusNumberSelect: (n: number) => void;
     onToggleBubble: (stop?: BusStop) => void;
+    busCount: number;
 }
 
 export const BusStopsPanel = ({
     onBusNumberSelect,
     onToggleBubble,
+    busCount,
 }: BusStopsPanelProps) => {
     return (
         <div
@@ -28,6 +30,7 @@ export const BusStopsPanel = ({
                 onSelect={(stop) => moveToLocation(stop.lat, stop.lng)}
                 onBusNumberSelect={onBusNumberSelect}
                 onToggleBubble={onToggleBubble}
+                busCount={busCount}
             />
         </div>
     );
