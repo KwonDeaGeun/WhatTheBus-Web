@@ -169,8 +169,8 @@ export const createBusOverlays = (
 
     return buses.map((bus) => {
         const busDiv = document.createElement("div");
-        busDiv.style.width = "12px";
-        busDiv.style.height = "23px";
+        busDiv.style.width = "18px";
+        busDiv.style.height = "34px";
         busDiv.style.display = "flex";
         busDiv.style.alignItems = "center";
         busDiv.style.justifyContent = "center";
