@@ -1,5 +1,6 @@
 import type { Bus } from "../data/bus";
 import type { BusStop } from "../data/busStops";
+import busIconSvg from "../assets/busIcon.svg";
 
 export interface OverlayHandle {
     setMap: (map: unknown) => void;
@@ -168,8 +169,8 @@ export const createBusOverlays = (
 
     return buses.map((bus) => {
         const busDiv = document.createElement("div");
-        busDiv.style.width = "32px";
-        busDiv.style.height = "32px";
+        busDiv.style.width = "24px";
+        busDiv.style.height = "46px";
         busDiv.style.display = "flex";
         busDiv.style.alignItems = "center";
         busDiv.style.justifyContent = "center";
@@ -177,8 +178,12 @@ export const createBusOverlays = (
         busDiv.setAttribute("role", "img");
         busDiv.setAttribute("aria-label", bus.shuttleId || "bus");
 
-        const iconSVG = createIconSVG("bus");
-        busDiv.appendChild(iconSVG);
+        const img = document.createElement("img");
+        img.src = busIconSvg;
+        img.alt = "버스";
+        img.style.width = "24px";
+        img.style.height = "46px";
+        busDiv.appendChild(img);
 
         const busPosition = new window.kakao.maps.LatLng(bus.lat, bus.lng);
         const busOverlay = new window.kakao.maps.CustomOverlay({
