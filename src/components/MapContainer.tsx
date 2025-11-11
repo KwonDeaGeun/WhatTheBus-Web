@@ -25,7 +25,7 @@ export const MapContainer = ({
     useMapEventHandlers(mapId);
 
     return (
-        <div id={mapId} style={{ height: "70vh", width: "100vw" }}>
+        <div id={mapId} style={{ flex: 1, width: "100%", minHeight: 200 }}>
             {children}
         </div>
     );

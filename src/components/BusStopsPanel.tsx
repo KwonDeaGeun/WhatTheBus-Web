@@ -17,12 +17,18 @@ export const BusStopsPanel = ({
     return (
         <div
             style={{
+                position: "fixed",
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 50,
                 padding: "10px",
                 display: "flex",
                 alignItems: "center",
                 gap: "8px",
                 backgroundColor: "#f5f5f5",
                 borderTop: "1px solid #ddd",
+                boxShadow: "0 -6px 20px rgba(0,0,0,0.08)",
             }}
         >
             <BusStops
