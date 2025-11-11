@@ -181,8 +181,8 @@ export const createBusOverlays = (
         const img = document.createElement("img");
         img.src = busIconSvg;
         img.alt = "버스";
-        img.style.width = "12px";
-        img.style.height = "23px";
+        img.style.width = "18px";
+        img.style.height = "34px";
         busDiv.appendChild(img);
 
         const busPosition = new window.kakao.maps.LatLng(bus.lat, bus.lng);
