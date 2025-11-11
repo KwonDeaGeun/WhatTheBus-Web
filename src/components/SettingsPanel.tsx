@@ -1,4 +1,5 @@
 import { X } from "lucide-react";
+import { useTranslation } from "../contexts/LanguageContext";
 
 interface SettingsPanelProps {
     langId: string;
@@ -13,6 +14,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
     setLanguage,
     onClose,
 }) => {
+    const { t } = useTranslation();
     return (
         <div
             role="dialog"
@@ -47,7 +49,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                     marginBottom: 12,
                 }}
             >
-                <div style={{ fontWeight: 600 }}>설정</div>
+                <div style={{ fontWeight: 600 }}>{t("settings.title")}</div>
                 <button
                     type="button"
                     onClick={onClose}
@@ -76,7 +78,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                         htmlFor={langId}
                         style={{ fontSize: 14, color: "#111827" }}
                     >
-                        언어
+                        {t("settings.language")}
                     </label>
                     <select
                         id={langId}
@@ -88,8 +90,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                             border: "1px solid #e5e7eb",
                         }}
                     >
-                        <option value="ko">한국어</option>
-                        <option value="en">English</option>
+                        <option value="ko">{t("settings.korean")}</option>
+                        <option value="en">{t("settings.english")}</option>
                     </select>
                 </div>
 
@@ -101,7 +103,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                     style={{ display: "flex", flexDirection: "column", gap: 6 }}
                 >
                     <div style={{ fontSize: 14, color: "#111827" }}>
-                        문의하기
+                        {t("settings.contact")}
                     </div>
                     <a
                         href="https://forms.gle/your-google-form-id"
@@ -109,7 +111,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                         rel="noopener noreferrer"
                         style={{ color: "#0ea5e9", textDecoration: "none" }}
                     >
-                        문의하기(구글폼)
+                        {t("settings.contact")}
                     </a>
                 </div>
 
@@ -121,7 +123,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                     style={{ display: "flex", flexDirection: "column", gap: 6 }}
                 >
                     <div style={{ fontSize: 14, color: "#111827" }}>
-                        사용 가이드
+                        {t("settings.userGuide")}
                     </div>
                     <div style={{ fontSize: 15, color: "#374151" }}>
                         <a
@@ -130,7 +132,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                             rel="noopener noreferrer"
                             style={{ color: "#0ea5e9", textDecoration: "none" }}
                         >
-                            사용 가이드 보기 (Notion)
+                            {t("settings.userGuide")}
                         </a>
                     </div>
                 </div>

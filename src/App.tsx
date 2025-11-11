@@ -16,6 +16,7 @@ const SettingsPanel = lazy(() => import("./components/SettingsPanel"));
 
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useBusLocations } from "./api/bus";
+import { LanguageProvider } from "./contexts/LanguageContext";
 import { useBusSelection } from "./hooks/useBusSelection";
 import { queryClient } from "./lib/query-client";
 
@@ -63,19 +64,24 @@ function App() {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <AppContent
-                mapId={mapId}
-                langId={langId}
-                language={language}
+            <LanguageProvider
+                language={language as "ko" | "en"}
                 setLanguage={setLanguage}
-                showSettings={showSettings}
-                toggleSettings={toggleSettings}
-                bubbleStop={bubbleStop}
-                setBubbleStop={setBubbleStop}
-            />
-            {import.meta.env.DEV && (
-                <ReactQueryDevtools initialIsOpen={false} />
-            )}
+            >
+                <AppContent
+                    mapId={mapId}
+                    langId={langId}
+                    language={language}
+                    setLanguage={setLanguage}
+                    showSettings={showSettings}
+                    toggleSettings={toggleSettings}
+                    bubbleStop={bubbleStop}
+                    setBubbleStop={setBubbleStop}
+                />
+                {import.meta.env.DEV && (
+                    <ReactQueryDevtools initialIsOpen={false} />
+                )}
+            </LanguageProvider>
         </QueryClientProvider>
     );
 }

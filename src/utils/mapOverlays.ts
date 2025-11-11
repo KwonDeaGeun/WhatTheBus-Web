@@ -1,6 +1,6 @@
+import busIconSvg from "../assets/busIcon.svg";
 import type { Bus } from "../data/bus";
 import type { BusStop } from "../data/busStops";
-import busIconSvg from "../assets/busIcon.svg";
 
 export interface OverlayHandle {
     setMap: (map: unknown) => void;

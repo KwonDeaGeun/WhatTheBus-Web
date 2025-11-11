@@ -19,8 +19,8 @@ export const SettingsButton = ({
             style={{
                 position: "fixed",
                 top: 40,
-                right: 12,
-                zIndex: 10000,
+                right: 16,
+                zIndex: 1000,
                 background: "white",
                 border: "1px solid #e5e7eb",
                 borderRadius: 8,
