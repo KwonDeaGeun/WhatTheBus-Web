@@ -169,8 +169,8 @@ export const createBusOverlays = (
 
     return buses.map((bus) => {
         const busDiv = document.createElement("div");
-        busDiv.style.width = "24px";
-        busDiv.style.height = "46px";
+        busDiv.style.width = "12px";
+        busDiv.style.height = "23px";
         busDiv.style.display = "flex";
         busDiv.style.alignItems = "center";
         busDiv.style.justifyContent = "center";
@@ -181,8 +181,8 @@ export const createBusOverlays = (
         const img = document.createElement("img");
         img.src = busIconSvg;
         img.alt = "버스";
-        img.style.width = "24px";
-        img.style.height = "46px";
+        img.style.width = "12px";
+        img.style.height = "23px";
         busDiv.appendChild(img);
 
         const busPosition = new window.kakao.maps.LatLng(bus.lat, bus.lng);
