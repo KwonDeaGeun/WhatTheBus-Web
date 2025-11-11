@@ -1,6 +1,7 @@
-import { Bus, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { BusStop } from "../data/busStops";
+import busIconSvg from "../assets/busIcon.svg";
 
 type Props = {
     busStops: BusStop[];
@@ -74,7 +75,7 @@ export default function BusStops({
                     className="group inline-flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border-0 bg-transparent px-4 py-3 transition-all duration-200 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     <div className="inline-flex items-center gap-3">
-                        <div className="flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center transition-transform duration-200 group-hover:scale-110">
                             <svg
                                 width="32"
                                 height="32"
@@ -155,10 +156,11 @@ export default function BusStops({
                     className="group inline-flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border-0 bg-transparent px-4 py-3 transition-all duration-200 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     <div className="inline-flex items-center gap-3">
-                        <div className="flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
-                            <Bus
-                                className="h-8 w-8 text-blue-600"
-                                strokeWidth={2.5}
+                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center transition-transform duration-200 group-hover:scale-110">
+                            <img 
+                                src={busIconSvg} 
+                                alt="버스" 
+                                style={{ width: "20px", height: "38px" }}
                             />
                         </div>
                         <span
