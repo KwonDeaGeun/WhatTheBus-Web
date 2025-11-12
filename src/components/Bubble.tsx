@@ -17,7 +17,7 @@ type Props = {
 };
 
 export default function Bubble({ stop, onClose }: Props) {
-    const { t, formatTime } = useTranslation();
+    const { t, formatTime, formatBusNumber } = useTranslation();
     useEffect(() => {
         if (typeof window.kakao === "undefined" || !window.map) return;
 
@@ -57,16 +57,20 @@ export default function Bubble({ stop, onClose }: Props) {
                     document.body.appendChild(el);
 
                     const rawName = String(stop.name);
-                    const translatedName = t(`busStop.${rawName}`);
+                    const translationKey = `busStop.${rawName}`;
+                    const translatedName = t(translationKey);
+                    
+                    // If translation key is returned as-is, use the raw name instead
+                    const displayBaseName = translatedName === translationKey ? rawName : translatedName;
 
-                    let displayName = translatedName;
+                    let displayName = displayBaseName;
                     if (DISPLAY_NAME_MAP[rawName]) {
                         const directionKey = DISPLAY_NAME_MAP[rawName].includes(
                             "죽전역"
                         )
                             ? "direction.toJukjeon"
                             : "direction.toDKU";
-                        displayName = `${translatedName} (${t(directionKey)})`;
+                        displayName = `${displayBaseName} (${t(directionKey)})`;
                     }
 
                     const root = createRoot(el);
@@ -145,7 +149,7 @@ export default function Bubble({ stop, onClose }: Props) {
                                                         fontWeight: 700,
                                                     }}
                                                 >
-                                                    24
+                                                    {formatBusNumber(1)}
                                                 </span>
                                                 <span style={{ marginLeft: 8 }}>
                                                     | {formatTime(5)}
@@ -173,7 +177,7 @@ export default function Bubble({ stop, onClose }: Props) {
                                                         fontWeight: 700,
                                                     }}
                                                 >
-                                                    720-3
+                                                    {formatBusNumber(2)}
                                                 </span>
                                                 <span style={{ marginLeft: 8 }}>
                                                     | {formatTime(15)}
@@ -237,7 +241,7 @@ export default function Bubble({ stop, onClose }: Props) {
             window.__currentBubbleOverlay = undefined;
             window.__currentBubbleStopName = undefined;
         };
-    }, [stop, onClose, t, formatTime]);
+    }, [stop, onClose, t, formatTime, formatBusNumber]);
 
     return null;
 }
