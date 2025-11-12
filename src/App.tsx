@@ -16,7 +16,7 @@ const SettingsPanel = lazy(() => import("./components/SettingsPanel"));
 
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useBusLocations } from "./api/bus";
-import { LanguageProvider } from "./contexts/LanguageContext";
+import { type Language, LanguageProvider } from "./contexts/LanguageContext";
 import { useBusSelection } from "./hooks/useBusSelection";
 import { queryClient } from "./lib/query-client";
 
@@ -31,8 +31,6 @@ const ReactQueryDevtools: ComponentType<DevtoolsProps> = import.meta.env.DEV
           }))
       )
     : ((() => null) as ComponentType<DevtoolsProps>);
-
-type Language = "ko" | "en";
 
 function App() {
     const mapId = useId();

@@ -1,6 +1,6 @@
 import { createContext, type ReactNode, useContext } from "react";
 
-type Language = "ko" | "en";
+export type Language = "ko" | "en";
 
 interface Translations {
     ko: Record<string, string>;

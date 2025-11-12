@@ -1,7 +1,5 @@
 import { X } from "lucide-react";
-import { useTranslation } from "../contexts/LanguageContext";
-
-type Language = "ko" | "en";
+import { type Language, useTranslation } from "../contexts/LanguageContext";
 
 interface SettingsPanelProps {
     langId: string;
