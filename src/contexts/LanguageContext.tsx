@@ -22,6 +22,11 @@ const translations: Translations = {
         // Directions
         "direction.toDKU": "단국대학교 방향",
         "direction.toJukjeon": "죽전역 방향",
+        
+        // Bus Labels
+        "bus.shuttleToDKU": "셔틀버스(단국대학교 방향)",
+        "bus.shuttleToJukjeon": "셔틀버스(죽전역 방향)",
+        "bus.shuttle": "셔틀버스",
 
         // SettingsPanel
         "settings.title": "설정",
@@ -50,6 +55,11 @@ const translations: Translations = {
         // Directions
         "direction.toDKU": "→ Dankook Univ.",
         "direction.toJukjeon": "→ Jukjeon Stn.",
+        
+        // Bus Labels
+        "bus.shuttleToDKU": "Shuttle Bus (→ Dankook Univ.)",
+        "bus.shuttleToJukjeon": "Shuttle Bus (→ Jukjeon Stn.)",
+        "bus.shuttle": "Shuttle Bus",
 
         // SettingsPanel
         "settings.title": "Settings",

@@ -15,16 +15,14 @@ export const useBusSelection = (
             if (bus && Number.isFinite(bus.lat) && Number.isFinite(bus.lng)) {
                 moveToLocation(bus.lat, bus.lng);
                 try {
-                    const direction =
+                    // Store direction info as a key that can be translated
+                    const directionKey =
                         bus.direction === true
-                            ? "단국대학교"
+                            ? "bus.shuttleToDKU"
                             : bus.direction === false
-                              ? "죽전역"
-                              : "";
-                    const label = direction
-                        ? `셔틀버스(${direction} 방향)`
-                        : "셔틀버스";
-                    setBubbleStop({ lat: bus.lat, lng: bus.lng, name: label });
+                              ? "bus.shuttleToJukjeon"
+                              : "bus.shuttle";
+                    setBubbleStop({ lat: bus.lat, lng: bus.lng, name: directionKey });
                 } catch {
                     /* ignore */
                 }
