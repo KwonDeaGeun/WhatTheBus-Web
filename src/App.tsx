@@ -32,14 +32,17 @@ const ReactQueryDevtools: ComponentType<DevtoolsProps> = import.meta.env.DEV
       )
     : ((() => null) as ComponentType<DevtoolsProps>);
 
+type Language = "ko" | "en";
+
 function App() {
     const mapId = useId();
     const langId = useId();
-    const [language, setLanguage] = useState(() => {
+    const [language, setLanguage] = useState<Language>(() => {
         try {
-            return typeof window !== "undefined" && window.localStorage
-                ? (localStorage.getItem("wtb:lang") ?? "ko")
-                : "ko";
+            const stored = typeof window !== "undefined" && window.localStorage
+                ? localStorage.getItem("wtb:lang")
+                : null;
+            return stored === "en" ? "en" : "ko";
         } catch {
             return "ko";
         }
@@ -65,7 +68,7 @@ function App() {
     return (
         <QueryClientProvider client={queryClient}>
             <LanguageProvider
-                language={language as "ko" | "en"}
+                language={language}
                 setLanguage={setLanguage}
             >
                 <AppContent
@@ -89,8 +92,8 @@ function App() {
 interface AppContentProps {
     mapId: string;
     langId: string;
-    language: string;
-    setLanguage: (lang: string) => void;
+    language: Language;
+    setLanguage: (lang: Language) => void;
     showSettings: boolean;
     toggleSettings: () => void;
     bubbleStop: { lat: number; lng: number; name: string } | undefined;

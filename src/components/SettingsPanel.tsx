@@ -1,10 +1,12 @@
 import { X } from "lucide-react";
 import { useTranslation } from "../contexts/LanguageContext";
 
+type Language = "ko" | "en";
+
 interface SettingsPanelProps {
     langId: string;
-    language: string;
-    setLanguage: (lang: string) => void;
+    language: Language;
+    setLanguage: (lang: Language) => void;
     onClose: () => void;
 }
 
@@ -83,7 +85,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                     <select
                         id={langId}
                         value={language}
-                        onChange={(e) => setLanguage(e.target.value)}
+                        onChange={(e) => setLanguage(e.target.value as Language)}
                         style={{
                             padding: 8,
                             borderRadius: 6,

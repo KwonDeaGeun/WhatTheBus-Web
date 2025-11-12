@@ -70,6 +70,7 @@ interface LanguageContextType {
     language: Language;
     setLanguage: (lang: Language) => void;
     t: (key: string) => string;
+    formatTime: (minutes: number) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(
@@ -91,8 +92,12 @@ export function LanguageProvider({
         return translations[language][key] || key;
     };
 
+    const formatTime = (minutes: number): string => {
+        return language === "ko" ? `${minutes}분 남음` : `${minutes}min`;
+    };
+
     return (
-        <LanguageContext.Provider value={{ language, setLanguage, t }}>
+        <LanguageContext.Provider value={{ language, setLanguage, t, formatTime }}>
             {children}
         </LanguageContext.Provider>
     );

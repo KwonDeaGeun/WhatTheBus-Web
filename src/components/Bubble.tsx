@@ -17,7 +17,7 @@ type Props = {
 };
 
 export default function Bubble({ stop, onClose }: Props) {
-    const { t } = useTranslation();
+    const { t, formatTime } = useTranslation();
     useEffect(() => {
         if (typeof window.kakao === "undefined" || !window.map) return;
 
@@ -148,7 +148,7 @@ export default function Bubble({ stop, onClose }: Props) {
                                                     24
                                                 </span>
                                                 <span style={{ marginLeft: 8 }}>
-                                                    | 5min
+                                                    | {formatTime(5)}
                                                 </span>
                                             </span>
                                         </div>
@@ -176,7 +176,7 @@ export default function Bubble({ stop, onClose }: Props) {
                                                     720-3
                                                 </span>
                                                 <span style={{ marginLeft: 8 }}>
-                                                    | 15min
+                                                    | {formatTime(15)}
                                                 </span>
                                             </span>
                                         </div>
@@ -237,7 +237,7 @@ export default function Bubble({ stop, onClose }: Props) {
             window.__currentBubbleOverlay = undefined;
             window.__currentBubbleStopName = undefined;
         };
-    }, [stop, onClose, t]);
+    }, [stop, onClose, t, formatTime]);
 
     return null;
 }
