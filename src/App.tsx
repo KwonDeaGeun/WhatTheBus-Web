@@ -16,6 +16,7 @@ const SettingsPanel = lazy(() => import("./components/SettingsPanel"));
 
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useBusLocations } from "./api/bus";
+import { type Language, LanguageProvider } from "./contexts/LanguageContext";
 import { useBusSelection } from "./hooks/useBusSelection";
 import { queryClient } from "./lib/query-client";
 
@@ -34,11 +35,12 @@ const ReactQueryDevtools: ComponentType<DevtoolsProps> = import.meta.env.DEV
 function App() {
     const mapId = useId();
     const langId = useId();
-    const [language, setLanguage] = useState(() => {
+    const [language, setLanguage] = useState<Language>(() => {
         try {
-            return typeof window !== "undefined" && window.localStorage
-                ? (localStorage.getItem("wtb:lang") ?? "ko")
-                : "ko";
+            const stored = typeof window !== "undefined" && window.localStorage
+                ? localStorage.getItem("wtb:lang")
+                : null;
+            return stored === "en" ? "en" : "ko";
         } catch {
             return "ko";
         }
@@ -63,19 +65,24 @@ function App() {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <AppContent
-                mapId={mapId}
-                langId={langId}
+            <LanguageProvider
                 language={language}
                 setLanguage={setLanguage}
-                showSettings={showSettings}
-                toggleSettings={toggleSettings}
-                bubbleStop={bubbleStop}
-                setBubbleStop={setBubbleStop}
-            />
-            {import.meta.env.DEV && (
-                <ReactQueryDevtools initialIsOpen={false} />
-            )}
+            >
+                <AppContent
+                    mapId={mapId}
+                    langId={langId}
+                    language={language}
+                    setLanguage={setLanguage}
+                    showSettings={showSettings}
+                    toggleSettings={toggleSettings}
+                    bubbleStop={bubbleStop}
+                    setBubbleStop={setBubbleStop}
+                />
+                {import.meta.env.DEV && (
+                    <ReactQueryDevtools initialIsOpen={false} />
+                )}
+            </LanguageProvider>
         </QueryClientProvider>
     );
 }
@@ -83,8 +90,8 @@ function App() {
 interface AppContentProps {
     mapId: string;
     langId: string;
-    language: string;
-    setLanguage: (lang: string) => void;
+    language: Language;
+    setLanguage: (lang: Language) => void;
     showSettings: boolean;
     toggleSettings: () => void;
     bubbleStop: { lat: number; lng: number; name: string } | undefined;

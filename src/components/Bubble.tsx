@@ -1,6 +1,7 @@
 import { BusFront, X } from "lucide-react";
 import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
+import { useTranslation } from "../contexts/LanguageContext";
 
 const DISPLAY_NAME_MAP: Record<string, string> = {
     죽전역: "죽전역(단국대학교 방향)",
@@ -16,6 +17,7 @@ type Props = {
 };
 
 export default function Bubble({ stop, onClose }: Props) {
+    const { t, formatTime } = useTranslation();
     useEffect(() => {
         if (typeof window.kakao === "undefined" || !window.map) return;
 
@@ -48,14 +50,24 @@ export default function Bubble({ stop, onClose }: Props) {
                     el.style.position = "fixed";
                     el.style.top = "16px";
                     el.style.left = "16px";
-                    el.style.right = "48px";
+                    el.style.right = "16px";
                     el.style.marginLeft = "auto";
                     el.style.marginRight = "auto";
-                    el.style.zIndex = "200";
+                    el.style.zIndex = "1001";
                     document.body.appendChild(el);
 
                     const rawName = String(stop.name);
-                    const displayName = DISPLAY_NAME_MAP[rawName] ?? rawName;
+                    const translatedName = t(`busStop.${rawName}`);
+
+                    let displayName = translatedName;
+                    if (DISPLAY_NAME_MAP[rawName]) {
+                        const directionKey = DISPLAY_NAME_MAP[rawName].includes(
+                            "죽전역"
+                        )
+                            ? "direction.toJukjeon"
+                            : "direction.toDKU";
+                        displayName = `${translatedName} (${t(directionKey)})`;
+                    }
 
                     const root = createRoot(el);
                     root.render(
@@ -64,8 +76,8 @@ export default function Bubble({ stop, onClose }: Props) {
                                 position: "fixed",
                                 top: "40px",
                                 left: "16px",
-                                right: "48px",
-                                zIndex: 200,
+                                right: "16px",
+                                zIndex: 10001,
                                 display: "flex",
                                 justifyContent: "center",
                             }}
@@ -136,7 +148,7 @@ export default function Bubble({ stop, onClose }: Props) {
                                                     24
                                                 </span>
                                                 <span style={{ marginLeft: 8 }}>
-                                                    | 5분 남음
+                                                    | {formatTime(5)}
                                                 </span>
                                             </span>
                                         </div>
@@ -164,7 +176,7 @@ export default function Bubble({ stop, onClose }: Props) {
                                                     720-3
                                                 </span>
                                                 <span style={{ marginLeft: 8 }}>
-                                                    | 15분 남음
+                                                    | {formatTime(15)}
                                                 </span>
                                             </span>
                                         </div>
@@ -225,7 +237,7 @@ export default function Bubble({ stop, onClose }: Props) {
             window.__currentBubbleOverlay = undefined;
             window.__currentBubbleStopName = undefined;
         };
-    }, [stop, onClose]);
+    }, [stop, onClose, t, formatTime]);
 
     return null;
 }

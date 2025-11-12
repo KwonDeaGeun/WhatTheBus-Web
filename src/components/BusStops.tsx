@@ -1,7 +1,8 @@
 import { ChevronDown } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
-import type { BusStop } from "../data/busStops";
 import busIconSvg from "../assets/busIcon.svg";
+import { useTranslation } from "../contexts/LanguageContext";
+import type { BusStop } from "../data/busStops";
 
 type Props = {
     busStops: BusStop[];
@@ -18,6 +19,7 @@ export default function BusStops({
     onToggleBubble,
     busCount = 0,
 }: Props) {
+    const { t } = useTranslation();
     const [openStops, setOpenStops] = useState(false);
     const [openNumbers, setOpenNumbers] = useState(false);
     const listId = useId();
@@ -101,7 +103,7 @@ export default function BusStops({
                                 openStops ? "hidden" : "inline"
                             }`}
                         >
-                            버스 정류장 선택하기
+                            {t("busStops.selectStop")}
                         </span>
                     </div>
                     <ChevronDown
@@ -133,7 +135,7 @@ export default function BusStops({
                             }
                             className="hover:-translate-y-0.5 min-h-[56px] cursor-pointer rounded-xl border-0 bg-blue-600 px-4 py-4 font-bold text-base text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none"
                         >
-                            {stop.name}
+                            {t(`busStop.${stop.name}`)}
                         </button>
                     ))}
                 </section>
@@ -157,9 +159,9 @@ export default function BusStops({
                 >
                     <div className="inline-flex items-center gap-3">
                         <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center transition-transform duration-200 group-hover:scale-110">
-                            <img 
-                                src={busIconSvg} 
-                                alt="버스" 
+                            <img
+                                src={busIconSvg}
+                                alt="버스"
                                 style={{ width: "20px", height: "38px" }}
                             />
                         </div>
@@ -168,7 +170,7 @@ export default function BusStops({
                                 openNumbers ? "hidden" : "inline"
                             }`}
                         >
-                            버스 선택하기
+                            {t("busStops.selectBus")}
                         </span>
                     </div>
                     <ChevronDown

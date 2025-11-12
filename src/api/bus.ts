@@ -10,7 +10,7 @@ export const useBusLocations = () => {
             const data = await apiGet<Bus[]>(API_ENDPOINTS.BUS.LOCATION);
             return Array.isArray(data) ? data : [];
         },
-        refetchInterval: 20000,
+        refetchInterval: 5000,
         refetchIntervalInBackground: true,
     });
 };
