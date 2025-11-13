@@ -139,7 +139,11 @@ function AppContent({
                     />
                 </Suspense>
             ) : null}
-            <MapContainer mapId={mapId} selectedStopName={bubbleStop?.name}>
+            <MapContainer 
+                mapId={mapId} 
+                selectedStopName={bubbleStop?.name}
+                onStopClick={(stop) => setBubbleStop(stop)}
+            >
                 <Bubble
                     stop={bubbleStop}
                     onClose={() => setBubbleStop(undefined)}
