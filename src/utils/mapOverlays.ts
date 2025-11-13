@@ -4,6 +4,7 @@ import type { BusStop } from "../data/busStops";
 
 export interface OverlayHandle {
     setMap: (map: unknown) => void;
+    cleanup?: () => void;
 }
 
 // Helper to create Lucide icon as SVG element
@@ -152,22 +153,31 @@ export const createBusStopOverlays = (
         const iconSVG = createIconSVG("mapPin", isSelected);
         busIconDiv.appendChild(iconSVG);
 
-        // 클릭 이벤트 추가
-        busIconDiv.addEventListener("click", () => {
+        // Named click handler for proper cleanup
+        const handleClick = (e: MouseEvent) => {
+            e.stopPropagation();
+            e.preventDefault();
             if (onStopClick) {
                 onStopClick(stop);
             }
-        });
+        };
 
-        // 키보드 접근성
-        busIconDiv.addEventListener("keydown", (e) => {
+        // Named keydown handler for proper cleanup
+        const handleKeydown = (e: KeyboardEvent) => {
             if (e.key === "Enter" || e.key === " ") {
+                e.stopPropagation();
                 e.preventDefault();
                 if (onStopClick) {
                     onStopClick(stop);
                 }
             }
-        });
+        };
+
+        // 클릭 이벤트 추가
+        busIconDiv.addEventListener("click", handleClick);
+
+        // 키보드 접근성
+        busIconDiv.addEventListener("keydown", handleKeydown);
 
         const markerPosition = new window.kakao.maps.LatLng(stop.lat, stop.lng);
         const overlay = new window.kakao.maps.CustomOverlay({
@@ -177,7 +187,16 @@ export const createBusStopOverlays = (
         });
         (overlay as unknown as { setMap: (m: unknown) => void }).setMap(map);
 
-        return overlay as OverlayHandle;
+        // Return overlay with cleanup method
+        return {
+            setMap: (m: unknown) => {
+                (overlay as unknown as { setMap: (m: unknown) => void }).setMap(m);
+            },
+            cleanup: () => {
+                busIconDiv.removeEventListener("click", handleClick);
+                busIconDiv.removeEventListener("keydown", handleKeydown);
+            },
+        };
     });
 };
 

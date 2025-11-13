@@ -5,12 +5,14 @@ import {
     useCallback,
     useEffect,
     useId,
+    useRef,
     useState,
 } from "react";
 import Bubble from "./components/Bubble";
 import { BusStopsPanel } from "./components/BusStopsPanel";
 import { MapContainer } from "./components/MapContainer";
 import { SettingsButton } from "./components/SettingsButton";
+import { ToastProvider, useToast } from "./components/ui/use-toast";
 
 const SettingsPanel = lazy(() => import("./components/SettingsPanel"));
 
@@ -69,19 +71,21 @@ function App() {
                 language={language}
                 setLanguage={setLanguage}
             >
-                <AppContent
-                    mapId={mapId}
-                    langId={langId}
-                    language={language}
-                    setLanguage={setLanguage}
-                    showSettings={showSettings}
-                    toggleSettings={toggleSettings}
-                    bubbleStop={bubbleStop}
-                    setBubbleStop={setBubbleStop}
-                />
-                {import.meta.env.DEV && (
-                    <ReactQueryDevtools initialIsOpen={false} />
-                )}
+                <ToastProvider>
+                    <AppContent
+                        mapId={mapId}
+                        langId={langId}
+                        language={language}
+                        setLanguage={setLanguage}
+                        showSettings={showSettings}
+                        toggleSettings={toggleSettings}
+                        bubbleStop={bubbleStop}
+                        setBubbleStop={setBubbleStop}
+                    />
+                    {import.meta.env.DEV && (
+                        <ReactQueryDevtools initialIsOpen={false} />
+                    )}
+                </ToastProvider>
             </LanguageProvider>
         </QueryClientProvider>
     );
@@ -112,8 +116,32 @@ function AppContent({
     bubbleStop,
     setBubbleStop,
 }: AppContentProps) {
-    const { data: buses = [] } = useBusLocations();
+    const { toast } = useToast();
+    const errorShownRef = useRef(false);
+
+    const handleBusLocationError = useCallback((message: string) => {
+        // Only show toast once to avoid spamming on refetch failures
+        if (!errorShownRef.current) {
+            toast({
+                title: "버스 위치 조회 오류",
+                description: message,
+                variant: "destructive",
+            });
+            errorShownRef.current = true;
+            // Reset after 30 seconds to allow showing error again if it persists
+            setTimeout(() => {
+                errorShownRef.current = false;
+            }, 30000);
+        }
+    }, [toast]);
+
+    const { data: buses = [] } = useBusLocations(handleBusLocationError);
     const handleBusNumberSelect = useBusSelection(buses, setBubbleStop);
+    const handleStopClick = useCallback(
+        (stop: { lat: number; lng: number; name: string }) =>
+            setBubbleStop(stop),
+        [setBubbleStop]
+    );
 
     return (
         <div
@@ -142,7 +170,7 @@ function AppContent({
             <MapContainer 
                 mapId={mapId} 
                 selectedStopName={bubbleStop?.name}
-                onStopClick={(stop) => setBubbleStop(stop)}
+                onStopClick={handleStopClick}
             >
                 <Bubble
                     stop={bubbleStop}

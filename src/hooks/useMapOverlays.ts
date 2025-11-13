@@ -29,6 +29,11 @@ export const useMapOverlays = (
                 } catch {
                     // ignore cleanup errors
                 }
+                try {
+                    overlay.cleanup?.();
+                } catch {
+                    // ignore cleanup errors
+                }
             });
         };
     }, [map, busStops, buses, selectedStopName, onStopClick]);
