@@ -159,6 +159,16 @@ export const createBusStopOverlays = (
             }
         });
 
+        // 키보드 접근성
+        busIconDiv.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                if (onStopClick) {
+                    onStopClick(stop);
+                }
+            }
+        });
+
         const markerPosition = new window.kakao.maps.LatLng(stop.lat, stop.lng);
         const overlay = new window.kakao.maps.CustomOverlay({
             position: markerPosition,
