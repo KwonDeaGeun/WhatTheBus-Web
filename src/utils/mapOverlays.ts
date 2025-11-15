@@ -3,6 +3,20 @@ import type { Bus } from "../data/bus";
 import type { BusStop } from "../data/busStops";
 import type { KakaoMap, KakaoOverlay } from "../types/kakao";
 
+// 상수 정의
+const BUS_ICON_DIMENSIONS = {
+    width: 18,
+    height: 34,
+} as const;
+
+const BUS_STOP_ICON_DIMENSIONS = {
+    width: 48,
+    height: 56,
+} as const;
+
+const ANIMATION_DURATION = '0.3s';
+const ROTATION_EASING = 'ease-out';
+
 export interface OverlayHandle {
     setMap: (map: KakaoMap | null) => void;
     cleanup?: () => void;
@@ -70,8 +84,8 @@ const normalizeRotation = (newAngle: number, prevAngle: number): number => {
 // Helper to create Lucide icon as SVG element
 const createIconSVG = (iconType: "mapPin" | "bus", showCircle = false) => {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("width", "48");
-    svg.setAttribute("height", "56");
+    svg.setAttribute("width", String(BUS_STOP_ICON_DIMENSIONS.width));
+    svg.setAttribute("height", String(BUS_STOP_ICON_DIMENSIONS.height));
     svg.setAttribute("viewBox", "0 0 24 40");
     svg.setAttribute("fill", "none");
     svg.setAttribute("stroke", showCircle ? "#dc2626" : "#2563eb"); // red-600 or blue-600
@@ -200,8 +214,8 @@ export const createBusStopOverlays = (
         const isSelected = selectedStopName === stop.name;
 
         const busIconDiv = document.createElement("div");
-        busIconDiv.style.width = "48px";
-        busIconDiv.style.height = "56px";
+        busIconDiv.style.width = `${BUS_STOP_ICON_DIMENSIONS.width}px`;
+        busIconDiv.style.height = `${BUS_STOP_ICON_DIMENSIONS.height}px`;
         busIconDiv.style.display = "flex";
         busIconDiv.style.alignItems = "center";
         busIconDiv.style.justifyContent = "center";
@@ -332,8 +346,8 @@ export const createBusOverlays = (
         } else {
             // 새 오버레이 생성
             const busDiv = document.createElement("div");
-            busDiv.style.width = "18px";
-            busDiv.style.height = "34px";
+            busDiv.style.width = `${BUS_ICON_DIMENSIONS.width}px`;
+            busDiv.style.height = `${BUS_ICON_DIMENSIONS.height}px`;
             busDiv.style.display = "flex";
             busDiv.style.alignItems = "center";
             busDiv.style.justifyContent = "center";
@@ -344,11 +358,11 @@ export const createBusOverlays = (
             const img = document.createElement("img");
             img.src = busIconSvg;
             img.alt = "버스";
-            img.style.width = "18px";
-            img.style.height = "34px";
+            img.style.width = `${BUS_ICON_DIMENSIONS.width}px`;
+            img.style.height = `${BUS_ICON_DIMENSIONS.height}px`;
             img.style.transform = `rotate(${rotation}deg)`;
             img.style.transformOrigin = "center center";
-            img.style.transition = "transform 0.3s ease-out";
+            img.style.transition = `transform ${ANIMATION_DURATION} ${ROTATION_EASING}`;
             busDiv.appendChild(img);
 
             const busPosition = new window.kakao.maps.LatLng(bus.lat, bus.lng);
