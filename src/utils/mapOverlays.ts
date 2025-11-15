@@ -243,9 +243,14 @@ export const createBusOverlays = (
         const busId = bus.shuttleId || `${bus.lat}-${bus.lng}`;
         const currentPosition = { lat: bus.lat, lng: bus.lng };
         
+        console.log(`[Bus ${busId}] 현재 위치:`, currentPosition);
+        console.log(`[Bus ${busId}] 저장된 버스 ID 목록:`, Array.from(previousBusPositions.keys()));
+        
         // 이전 위치가 있으면 각도 계산
         let rotation = 0;
         const previousData = previousBusPositions.get(busId);
+        console.log(`[Bus ${busId}] 이전 데이터:`, previousData);
+        
         if (previousData) {
             // 이전 위치와 현재 위치가 다른 경우에만 각도 계산
             if (
@@ -258,14 +263,14 @@ export const createBusOverlays = (
                     currentPosition.lat,
                     currentPosition.lng
                 );
-                console.log(`[Bus ${busId}] 새 각도 계산: ${rotation.toFixed(2)}°`);
+                console.log(`[Bus ${busId}] 새 각도 계산: ${rotation.toFixed(2)}° (이전: ${previousData.lat},${previousData.lng} → 현재: ${currentPosition.lat},${currentPosition.lng})`);
             } else {
                 // 위치가 변경되지 않았으면 이전 회전 값 재사용
                 rotation = previousData.rotation;
-                console.log(`[Bus ${busId}] 이전 각도 재사용: ${rotation.toFixed(2)}°`);
+                console.log(`[Bus ${busId}] 이전 각도 재사용: ${rotation.toFixed(2)}° (위치 변경 없음)`);
             } 
         } else {
-            console.log(`[Bus ${busId}] 초기 각도: ${rotation}°`);
+            console.log(`[Bus ${busId}] 초기 각도: ${rotation}° (이전 데이터 없음)`);
         }
         
         // 현재 위치와 회전 값을 저장
