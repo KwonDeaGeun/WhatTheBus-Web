@@ -21,7 +21,7 @@ export const useBusLocations = (
                 return [];
             }
         },
-        refetchInterval: 5000,
+        refetchInterval: 7000,
         refetchIntervalInBackground: true,
         retry: 2,
     });

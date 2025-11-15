@@ -17,6 +17,7 @@ interface KakaoMap {
 
 interface KakaoOverlay {
     setMap: (map: KakaoMap | null) => void;
+    setPosition: (position: KakaoLatLng) => void;
 }
 
 declare global {

@@ -10,6 +10,22 @@ export interface OverlayHandle {
 // 버스 ID별 이전 위치와 회전 값을 저장
 const previousBusPositions = new Map<string, { lat: number; lng: number; rotation: number }>();
 
+// 버스 ID별 오버레이와 DOM 요소를 캐시
+const busOverlayCache = new Map<string, { 
+    overlay: unknown; 
+    img: HTMLImageElement;
+    div: HTMLDivElement;
+}>();
+
+// 모든 버스 오버레이 정리 (페이지 이동 시 호출)
+export const clearAllBusOverlays = () => {
+    for (const [busId, cached] of busOverlayCache.entries()) {
+        (cached.overlay as { setMap: (m: unknown) => void }).setMap(null);
+        busOverlayCache.delete(busId);
+        previousBusPositions.delete(busId);
+    }
+};
+
 // 두 좌표 사이의 각도 계산 (북쪽 기준, 시계방향)
 const calculateAngle = (
     prevLat: number,
@@ -28,6 +44,26 @@ const calculateAngle = (
     const angleDeg = angleRad * (180 / Math.PI);
     
     return angleDeg;
+};
+
+// 최단 경로로 회전하도록 각도 정규화 (0 ~ 360 범위)
+const normalizeRotation = (newAngle: number, prevAngle: number): number => {
+    // 이전 각도를 0 ~ 360 범위로 정규화
+    const normalizedPrev = ((prevAngle % 360) + 360) % 360;
+    
+    // 새 각도도 0 ~ 360 범위로 정규화
+    const normalizedNew = ((newAngle % 360) + 360) % 360;
+    
+    // 각도 차이 계산
+    let diff = normalizedNew - normalizedPrev;
+    
+    // 최단 경로로 차이 조정
+    if (diff > 180) diff -= 360;
+    if (diff < -180) diff += 360;
+    
+    // 정규화된 이전 각도에서 최단 거리만큼 회전 후 0~360 범위로
+    const result = normalizedPrev + diff;
+    return ((result % 360) + 360) % 360;
 };
 
 // Helper to create Lucide icon as SVG element
@@ -232,9 +268,14 @@ export const createBusOverlays = (
     // 현재 활성 버스 ID 집합
     const activeBusIds = new Set(buses.map(bus => bus.shuttleId || `${bus.lat}-${bus.lng}`));
     
-    // 비활성 버스 ID를 previousBusPositions에서 제거 (메모리 누수 방지)
-    for (const busId of previousBusPositions.keys()) {
+    // 비활성 버스 ID를 캐시와 previousBusPositions에서 제거 (메모리 누수 방지)
+    for (const busId of busOverlayCache.keys()) {
         if (!activeBusIds.has(busId)) {
+            const cached = busOverlayCache.get(busId);
+            if (cached) {
+                (cached.overlay as { setMap: (m: unknown) => void }).setMap(null);
+            }
+            busOverlayCache.delete(busId);
             previousBusPositions.delete(busId);
         }
     }
@@ -253,12 +294,14 @@ export const createBusOverlays = (
                 previousData.lat !== currentPosition.lat ||
                 previousData.lng !== currentPosition.lng
             ) {
-                rotation = calculateAngle(
+                const newAngle = calculateAngle(
                     previousData.lat,
                     previousData.lng,
                     currentPosition.lat,
                     currentPosition.lng
                 );
+                // 최단 경로로 회전하도록 정규화
+                rotation = normalizeRotation(newAngle, previousData.rotation);
             } else {
                 // 위치가 변경되지 않았으면 이전 회전 값 재사용
                 rotation = previousData.rotation;
@@ -272,41 +315,60 @@ export const createBusOverlays = (
             rotation 
         });
 
-        const busDiv = document.createElement("div");
-        busDiv.style.width = "18px";
-        busDiv.style.height = "34px";
-        busDiv.style.display = "flex";
-        busDiv.style.alignItems = "center";
-        busDiv.style.justifyContent = "center";
-        busDiv.style.cursor = "pointer";
-        busDiv.setAttribute("role", "img");
-        busDiv.setAttribute("aria-label", bus.shuttleId || "bus");
+        // 캐시된 오버레이가 있으면 재사용
+        let cached = busOverlayCache.get(busId);
+        
+        if (cached) {
+            // 기존 오버레이 업데이트
+            const busPosition = new window.kakao.maps.LatLng(bus.lat, bus.lng);
+            (cached.overlay as { setPosition: (pos: unknown) => void }).setPosition?.(busPosition);
+            
+            // 회전 업데이트 (CSS transition이 적용됨)
+            cached.img.style.transform = `rotate(${rotation}deg)`;
+        } else {
+            // 새 오버레이 생성
+            const busDiv = document.createElement("div");
+            busDiv.style.width = "18px";
+            busDiv.style.height = "34px";
+            busDiv.style.display = "flex";
+            busDiv.style.alignItems = "center";
+            busDiv.style.justifyContent = "center";
+            busDiv.style.cursor = "pointer";
+            busDiv.setAttribute("role", "img");
+            busDiv.setAttribute("aria-label", bus.shuttleId || "bus");
 
-        const img = document.createElement("img");
-        img.src = busIconSvg;
-        img.alt = "버스";
-        img.style.width = "18px";
-        img.style.height = "34px";
-        // 회전 적용
-        img.style.transform = `rotate(${rotation}deg)`;
-        img.style.transformOrigin = "center center";
-        img.style.transition = "transform 0.3s ease-out";
-        busDiv.appendChild(img);
+            const img = document.createElement("img");
+            img.src = busIconSvg;
+            img.alt = "버스";
+            img.style.width = "18px";
+            img.style.height = "34px";
+            img.style.transform = `rotate(${rotation}deg)`;
+            img.style.transformOrigin = "center center";
+            img.style.transition = "transform 0.3s ease-out";
+            busDiv.appendChild(img);
 
-        const busPosition = new window.kakao.maps.LatLng(bus.lat, bus.lng);
-        const busOverlay = new window.kakao.maps.CustomOverlay({
-            position: busPosition,
-            content: busDiv,
-            yAnchor: 1,
-        });
-        (busOverlay as unknown as { setMap: (m: unknown) => void }).setMap(map);
+            const busPosition = new window.kakao.maps.LatLng(bus.lat, bus.lng);
+            const busOverlay = new window.kakao.maps.CustomOverlay({
+                position: busPosition,
+                content: busDiv,
+                yAnchor: 1,
+            });
+            (busOverlay as unknown as { setMap: (m: unknown) => void }).setMap(map);
+
+            // 캐시에 저장
+            cached = { overlay: busOverlay, img, div: busDiv };
+            busOverlayCache.set(busId, cached);
+        }
 
         return {
             setMap: (m: unknown) => {
-                (busOverlay as unknown as { setMap: (m: unknown) => void }).setMap(m);
+                if (cached) {
+                    (cached.overlay as { setMap: (m: unknown) => void }).setMap(m);
+                }
             },
             cleanup: () => {
-                // 오버레이 제거 시 previousBusPositions에서도 제거
+                // 오버레이 제거 시 캐시와 previousBusPositions에서도 제거
+                busOverlayCache.delete(busId);
                 previousBusPositions.delete(busId);
             },
         };
