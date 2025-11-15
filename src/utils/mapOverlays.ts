@@ -258,10 +258,14 @@ export const createBusOverlays = (
                     currentPosition.lat,
                     currentPosition.lng
                 );
+                console.log(`[Bus ${busId}] 새 각도 계산: ${rotation.toFixed(2)}°`);
             } else {
                 // 위치가 변경되지 않았으면 이전 회전 값 재사용
                 rotation = previousData.rotation;
-            }
+                console.log(`[Bus ${busId}] 이전 각도 재사용: ${rotation.toFixed(2)}°`);
+            } 
+        } else {
+            console.log(`[Bus ${busId}] 초기 각도: ${rotation}°`);
         }
         
         // 현재 위치와 회전 값을 저장
