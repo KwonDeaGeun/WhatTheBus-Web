@@ -7,6 +7,29 @@ export interface OverlayHandle {
     cleanup?: () => void;
 }
 
+// 버스 ID별 이전 위치와 회전 값을 저장
+const previousBusPositions = new Map<string, { lat: number; lng: number; rotation: number }>();
+
+// 두 좌표 사이의 각도 계산 (북쪽 기준, 시계방향)
+const calculateAngle = (
+    prevLat: number,
+    prevLng: number,
+    currLat: number,
+    currLng: number
+): number => {
+    const deltaLat = currLat - prevLat;
+    const deltaLng = currLng - prevLng;
+    
+    // atan2를 사용하여 각도 계산 (라디안)
+    // atan2(y, x)는 x축 기준 각도를 반환하므로, 북쪽 기준으로 변환
+    const angleRad = Math.atan2(deltaLng, deltaLat);
+    
+    // 라디안을 도(degree)로 변환
+    const angleDeg = angleRad * (180 / Math.PI);
+    
+    return angleDeg;
+};
+
 // Helper to create Lucide icon as SVG element
 const createIconSVG = (iconType: "mapPin" | "bus", showCircle = false) => {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -206,7 +229,48 @@ export const createBusOverlays = (
 ): OverlayHandle[] => {
     if (!map || typeof window === "undefined" || !window.kakao?.maps) return [];
 
+    // 현재 활성 버스 ID 집합
+    const activeBusIds = new Set(buses.map(bus => bus.shuttleId || `${bus.lat}-${bus.lng}`));
+    
+    // 비활성 버스 ID를 previousBusPositions에서 제거 (메모리 누수 방지)
+    for (const busId of previousBusPositions.keys()) {
+        if (!activeBusIds.has(busId)) {
+            previousBusPositions.delete(busId);
+        }
+    }
+
     return buses.map((bus) => {
+        const busId = bus.shuttleId || `${bus.lat}-${bus.lng}`;
+        const currentPosition = { lat: bus.lat, lng: bus.lng };
+        
+        // 이전 위치가 있으면 각도 계산
+        let rotation = 0;
+        const previousData = previousBusPositions.get(busId);
+        if (previousData) {
+            // 이전 위치와 현재 위치가 다른 경우에만 각도 계산
+            if (
+                previousData.lat !== currentPosition.lat ||
+                previousData.lng !== currentPosition.lng
+            ) {
+                rotation = calculateAngle(
+                    previousData.lat,
+                    previousData.lng,
+                    currentPosition.lat,
+                    currentPosition.lng
+                );
+            } else {
+                // 위치가 변경되지 않았으면 이전 회전 값 재사용
+                rotation = previousData.rotation;
+            }
+        }
+        
+        // 현재 위치와 회전 값을 저장
+        previousBusPositions.set(busId, { 
+            lat: currentPosition.lat, 
+            lng: currentPosition.lng, 
+            rotation 
+        });
+
         const busDiv = document.createElement("div");
         busDiv.style.width = "18px";
         busDiv.style.height = "34px";
@@ -222,6 +286,10 @@ export const createBusOverlays = (
         img.alt = "버스";
         img.style.width = "18px";
         img.style.height = "34px";
+        // 회전 적용
+        img.style.transform = `rotate(${rotation}deg)`;
+        img.style.transformOrigin = "center center";
+        img.style.transition = "transform 0.3s ease-out";
         busDiv.appendChild(img);
 
         const busPosition = new window.kakao.maps.LatLng(bus.lat, bus.lng);
@@ -232,6 +300,14 @@ export const createBusOverlays = (
         });
         (busOverlay as unknown as { setMap: (m: unknown) => void }).setMap(map);
 
-        return busOverlay as OverlayHandle;
+        return {
+            setMap: (m: unknown) => {
+                (busOverlay as unknown as { setMap: (m: unknown) => void }).setMap(m);
+            },
+            cleanup: () => {
+                // 오버레이 제거 시 previousBusPositions에서도 제거
+                previousBusPositions.delete(busId);
+            },
+        };
     });
 };
