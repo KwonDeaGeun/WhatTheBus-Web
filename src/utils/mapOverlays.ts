@@ -7,6 +7,29 @@ export interface OverlayHandle {
     cleanup?: () => void;
 }
 
+// 버스 ID별 이전 위치를 저장
+const previousBusPositions = new Map<string, { lat: number; lng: number }>();
+
+// 두 좌표 사이의 각도 계산 (북쪽 기준, 시계방향)
+const calculateAngle = (
+    prevLat: number,
+    prevLng: number,
+    currLat: number,
+    currLng: number
+): number => {
+    const deltaLat = currLat - prevLat;
+    const deltaLng = currLng - prevLng;
+    
+    // atan2를 사용하여 각도 계산 (라디안)
+    // atan2(y, x)는 x축 기준 각도를 반환하므로, 북쪽 기준으로 변환
+    const angleRad = Math.atan2(deltaLng, deltaLat);
+    
+    // 라디안을 도(degree)로 변환
+    const angleDeg = angleRad * (180 / Math.PI);
+    
+    return angleDeg;
+};
+
 // Helper to create Lucide icon as SVG element
 const createIconSVG = (iconType: "mapPin" | "bus", showCircle = false) => {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -207,6 +230,30 @@ export const createBusOverlays = (
     if (!map || typeof window === "undefined" || !window.kakao?.maps) return [];
 
     return buses.map((bus) => {
+        const busId = bus.shuttleId || `${bus.lat}-${bus.lng}`;
+        const currentPosition = { lat: bus.lat, lng: bus.lng };
+        
+        // 이전 위치가 있으면 각도 계산
+        let rotation = 0;
+        const previousPosition = previousBusPositions.get(busId);
+        if (previousPosition) {
+            // 이전 위치와 현재 위치가 다른 경우에만 각도 계산
+            if (
+                previousPosition.lat !== currentPosition.lat ||
+                previousPosition.lng !== currentPosition.lng
+            ) {
+                rotation = calculateAngle(
+                    previousPosition.lat,
+                    previousPosition.lng,
+                    currentPosition.lat,
+                    currentPosition.lng
+                );
+            }
+        }
+        
+        // 현재 위치를 이전 위치로 저장
+        previousBusPositions.set(busId, currentPosition);
+
         const busDiv = document.createElement("div");
         busDiv.style.width = "18px";
         busDiv.style.height = "34px";
@@ -222,6 +269,10 @@ export const createBusOverlays = (
         img.alt = "버스";
         img.style.width = "18px";
         img.style.height = "34px";
+        // 회전 적용
+        img.style.transform = `rotate(${rotation}deg)`;
+        img.style.transformOrigin = "center center";
+        img.style.transition = "transform 0.3s ease-out";
         busDiv.appendChild(img);
 
         const busPosition = new window.kakao.maps.LatLng(bus.lat, bus.lng);
