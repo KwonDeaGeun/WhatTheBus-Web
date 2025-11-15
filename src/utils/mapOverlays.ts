@@ -4,6 +4,7 @@ import type { BusStop } from "../data/busStops";
 
 export interface OverlayHandle {
     setMap: (map: unknown) => void;
+    cleanup?: () => void;
 }
 
 // Helper to create Lucide icon as SVG element
@@ -130,7 +131,8 @@ const createIconSVG = (iconType: "mapPin" | "bus", showCircle = false) => {
 export const createBusStopOverlays = (
     map: unknown,
     busStops: BusStop[],
-    selectedStopName?: string
+    selectedStopName?: string,
+    onStopClick?: (stop: BusStop) => void
 ): OverlayHandle[] => {
     if (!map || typeof window === "undefined" || !window.kakao?.maps) return [];
 
@@ -143,11 +145,39 @@ export const createBusStopOverlays = (
         busIconDiv.style.display = "flex";
         busIconDiv.style.alignItems = "center";
         busIconDiv.style.justifyContent = "center";
-        busIconDiv.setAttribute("role", "img");
+        busIconDiv.style.cursor = "pointer";
+        busIconDiv.setAttribute("role", "button");
         busIconDiv.setAttribute("aria-label", `정류장: ${stop.name}`);
+        busIconDiv.setAttribute("tabindex", "0");
 
         const iconSVG = createIconSVG("mapPin", isSelected);
         busIconDiv.appendChild(iconSVG);
+
+        // Named click handler for proper cleanup
+        const handleClick = (e: MouseEvent) => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (onStopClick) {
+                onStopClick(stop);
+            }
+        };
+
+        // Named keydown handler for proper cleanup
+        const handleKeydown = (e: KeyboardEvent) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.stopPropagation();
+                e.preventDefault();
+                if (onStopClick) {
+                    onStopClick(stop);
+                }
+            }
+        };
+
+        // 클릭 이벤트 추가
+        busIconDiv.addEventListener("click", handleClick);
+
+        // 키보드 접근성
+        busIconDiv.addEventListener("keydown", handleKeydown);
 
         const markerPosition = new window.kakao.maps.LatLng(stop.lat, stop.lng);
         const overlay = new window.kakao.maps.CustomOverlay({
@@ -157,7 +187,16 @@ export const createBusStopOverlays = (
         });
         (overlay as unknown as { setMap: (m: unknown) => void }).setMap(map);
 
-        return overlay as OverlayHandle;
+        // Return overlay with cleanup method
+        return {
+            setMap: (m: unknown) => {
+                (overlay as unknown as { setMap: (m: unknown) => void }).setMap(m);
+            },
+            cleanup: () => {
+                busIconDiv.removeEventListener("click", handleClick);
+                busIconDiv.removeEventListener("keydown", handleKeydown);
+            },
+        };
     });
 };
 

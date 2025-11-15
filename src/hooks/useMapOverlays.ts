@@ -11,13 +11,14 @@ export const useMapOverlays = (
     map: unknown,
     busStops: BusStop[],
     buses: Bus[],
-    selectedStopName?: string
+    selectedStopName?: string,
+    onStopClick?: (stop: BusStop) => void
 ) => {
     useEffect(() => {
         if (!map) return;
 
         const overlays: OverlayHandle[] = [
-            ...createBusStopOverlays(map, busStops, selectedStopName),
+            ...createBusStopOverlays(map, busStops, selectedStopName, onStopClick),
             ...createBusOverlays(map, buses),
         ];
 
@@ -28,7 +29,12 @@ export const useMapOverlays = (
                 } catch {
                     // ignore cleanup errors
                 }
+                try {
+                    overlay.cleanup?.();
+                } catch {
+                    // ignore cleanup errors
+                }
             });
         };
-    }, [map, busStops, buses, selectedStopName]);
+    }, [map, busStops, buses, selectedStopName, onStopClick]);
 };

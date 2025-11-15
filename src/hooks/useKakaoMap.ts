@@ -49,66 +49,6 @@ export const useKakaoMap = ({ mapId, toast }: UseKakaoMapOptions) => {
 
             window.map = map;
             setMapInstance(map);
-
-            // WebView hooks
-            if (typeof window.__moveFromRN !== "function") {
-                window.__moveFromRN = (lat: number, lng: number) => {
-                    try {
-                        if (
-                            window.map &&
-                            typeof window.map.setCenter === "function" &&
-                            typeof window.kakao !== "undefined"
-                        ) {
-                            window.map.setCenter(
-                                new window.kakao.maps.LatLng(lat, lng)
-                            );
-                        } else {
-                            window.__pendingMove = { lat, lng };
-                        }
-                    } catch {
-                        // ignore
-                    }
-                };
-            }
-
-            if (
-                window.__pendingMove &&
-                Number.isFinite(window.__pendingMove.lat) &&
-                Number.isFinite(window.__pendingMove.lng)
-            ) {
-                try {
-                    window.map?.setCenter(
-                        new window.kakao.maps.LatLng(
-                            window.__pendingMove.lat,
-                            window.__pendingMove.lng
-                        )
-                    );
-                    window.__pendingMove = null;
-                } catch {
-                    // ignore
-                }
-            }
-
-            if (typeof window.__onMapReady === "function") {
-                try {
-                    window.__onMapReady();
-                } catch {
-                    // ignore
-                }
-            }
-
-            if (
-                window.ReactNativeWebView &&
-                typeof window.ReactNativeWebView.postMessage === "function"
-            ) {
-                try {
-                    window.ReactNativeWebView.postMessage(
-                        JSON.stringify({ type: "MAP_READY" })
-                    );
-                } catch {
-                    // ignore
-                }
-            }
         };
 
         const loadKakaoMapScript = () => {
