@@ -1,9 +1,10 @@
 import busIconSvg from "../assets/busIcon.svg";
 import type { Bus } from "../data/bus";
 import type { BusStop } from "../data/busStops";
+import type { KakaoMap, KakaoOverlay } from "../types/kakao";
 
 export interface OverlayHandle {
-    setMap: (map: unknown) => void;
+    setMap: (map: KakaoMap | null) => void;
     cleanup?: () => void;
 }
 
@@ -12,7 +13,7 @@ const previousBusPositions = new Map<string, { lat: number; lng: number; rotatio
 
 // 버스 ID별 오버레이와 DOM 요소를 캐시
 const busOverlayCache = new Map<string, { 
-    overlay: unknown; 
+    overlay: KakaoOverlay; 
     img: HTMLImageElement;
     div: HTMLDivElement;
 }>();
@@ -20,7 +21,7 @@ const busOverlayCache = new Map<string, {
 // 모든 버스 오버레이 정리 (페이지 이동 시 호출)
 export const clearAllBusOverlays = () => {
     for (const [busId, cached] of busOverlayCache.entries()) {
-        (cached.overlay as { setMap: (m: unknown) => void }).setMap(null);
+        cached.overlay.setMap(null);
         busOverlayCache.delete(busId);
         previousBusPositions.delete(busId);
     }
@@ -188,7 +189,7 @@ const createIconSVG = (iconType: "mapPin" | "bus", showCircle = false) => {
 };
 
 export const createBusStopOverlays = (
-    map: unknown,
+    map: KakaoMap,
     busStops: BusStop[],
     selectedStopName?: string,
     onStopClick?: (stop: BusStop) => void
@@ -260,7 +261,7 @@ export const createBusStopOverlays = (
 };
 
 export const createBusOverlays = (
-    map: unknown,
+    map: KakaoMap,
     buses: Bus[]
 ): OverlayHandle[] => {
     if (!map || typeof window === "undefined" || !window.kakao?.maps) return [];
@@ -273,7 +274,7 @@ export const createBusOverlays = (
         if (!activeBusIds.has(busId)) {
             const cached = busOverlayCache.get(busId);
             if (cached) {
-                (cached.overlay as { setMap: (m: unknown) => void }).setMap(null);
+                cached.overlay.setMap(null);
             }
             busOverlayCache.delete(busId);
             previousBusPositions.delete(busId);
@@ -321,10 +322,10 @@ export const createBusOverlays = (
         if (cached) {
             // 기존 오버레이 업데이트
             const busPosition = new window.kakao.maps.LatLng(bus.lat, bus.lng);
-            (cached.overlay as { setPosition: (pos: unknown) => void }).setPosition?.(busPosition);
+            cached.overlay.setPosition(busPosition);
             
             // map 인스턴스가 변경되었을 수 있으므로 항상 setMap 호출
-            (cached.overlay as { setMap: (m: unknown) => void }).setMap(map);
+            cached.overlay.setMap(map);
             
             // 회전 업데이트 (CSS transition이 적용됨)
             cached.img.style.transform = `rotate(${rotation}deg)`;
@@ -356,7 +357,7 @@ export const createBusOverlays = (
                 content: busDiv,
                 yAnchor: 1,
             });
-            (busOverlay as unknown as { setMap: (m: unknown) => void }).setMap(map);
+            busOverlay.setMap(map);
 
             // 캐시에 저장
             cached = { overlay: busOverlay, img, div: busDiv };
@@ -364,15 +365,15 @@ export const createBusOverlays = (
         }
 
         return {
-            setMap: (m: unknown) => {
+            setMap: (m) => {
                 if (cached) {
-                    (cached.overlay as { setMap: (m: unknown) => void }).setMap(m);
+                    cached.overlay.setMap(m);
                 }
             },
             cleanup: () => {
                 // 오버레이를 지도에서 제거
                 if (cached) {
-                    (cached.overlay as { setMap: (m: unknown) => void }).setMap(null);
+                    cached.overlay.setMap(null);
                 }
                 // 캐시와 previousBusPositions에서도 제거
                 busOverlayCache.delete(busId);

@@ -1,11 +1,11 @@
-export {};
-
-interface KakaoLatLng {
+export interface KakaoLatLng {
     lat: number;
     lng: number;
+    getLat(): number;
+    getLng(): number;
 }
 
-interface KakaoMap {
+export interface KakaoMap {
     setCenter: (pos: KakaoLatLng) => void;
     setMinLevel: (level: number) => void;
     setMaxLevel: (level: number) => void;
@@ -15,9 +15,16 @@ interface KakaoMap {
         | { getLat: () => number; getLng: () => number };
 }
 
-interface KakaoOverlay {
+export interface KakaoOverlay {
     setMap: (map: KakaoMap | null) => void;
     setPosition: (position: KakaoLatLng) => void;
+    getPosition(): KakaoLatLng;
+    setContent(content: HTMLElement | string): void;
+    getContent(): HTMLElement;
+    setVisible(visible: boolean): void;
+    getVisible(): boolean;
+    setZIndex(zIndex: number): void;
+    getZIndex(): number;
 }
 
 declare global {
