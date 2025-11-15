@@ -1,29 +1,33 @@
 import { useEffect } from "react";
 import type { Bus } from "../data/bus";
 import type { BusStop } from "../data/busStops";
+import type { KakaoMap } from "../types/kakao";
 import {
+    clearAllBusOverlays,
     createBusOverlays,
     createBusStopOverlays,
-    type OverlayHandle,
 } from "../utils/mapOverlays";
 
 export const useMapOverlays = (
-    map: unknown,
+    map: KakaoMap | null,
     busStops: BusStop[],
     buses: Bus[],
     selectedStopName?: string,
     onStopClick?: (stop: BusStop) => void
 ) => {
+    // 버스 정류장 오버레이 관리
     useEffect(() => {
         if (!map) return;
 
-        const overlays: OverlayHandle[] = [
-            ...createBusStopOverlays(map, busStops, selectedStopName, onStopClick),
-            ...createBusOverlays(map, buses),
-        ];
+        const stopOverlays = createBusStopOverlays(
+            map,
+            busStops,
+            selectedStopName,
+            onStopClick
+        );
 
         return () => {
-            overlays.forEach((overlay) => {
+            stopOverlays.forEach((overlay) => {
                 try {
                     overlay.setMap(null);
                 } catch {
@@ -36,5 +40,18 @@ export const useMapOverlays = (
                 }
             });
         };
-    }, [map, busStops, buses, selectedStopName, onStopClick]);
+    }, [map, busStops, selectedStopName, onStopClick]);
+
+    useEffect(() => {
+        // 컴포넌트 언마운트 또는 map 변경 시 정리
+        return () => {
+            clearAllBusOverlays();
+        };
+    }, []);
+
+    // 버스 오버레이 업데이트 (캐시 유지)
+    useEffect(() => {
+        if (!map) return;
+        createBusOverlays(map, buses);
+    }, [map, buses]);
 };

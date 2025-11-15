@@ -57,7 +57,7 @@ export default function Bubble({ stop, onClose }: Props) {
                     document.body.appendChild(el);
 
                     const rawName = String(stop.name);
-                    
+
                     // Check if it's a bus key (starts with "bus.")
                     let displayName: string;
                     if (rawName.startsWith("bus.")) {
@@ -67,15 +67,18 @@ export default function Bubble({ stop, onClose }: Props) {
                         // It's a bus stop name
                         const translationKey = `busStop.${rawName}`;
                         const translatedName = t(translationKey);
-                        
+
                         // If translation key is returned as-is, use the raw name instead
-                        const displayBaseName = translatedName === translationKey ? rawName : translatedName;
+                        const displayBaseName =
+                            translatedName === translationKey
+                                ? rawName
+                                : translatedName;
 
                         displayName = displayBaseName;
                         if (DISPLAY_NAME_MAP[rawName]) {
-                            const directionKey = DISPLAY_NAME_MAP[rawName].includes(
-                                "죽전역"
-                            )
+                            const directionKey = DISPLAY_NAME_MAP[
+                                rawName
+                            ].includes("죽전역")
                                 ? "direction.toJukjeon"
                                 : "direction.toDKU";
                             displayName = `${displayBaseName} (${t(directionKey)})`;

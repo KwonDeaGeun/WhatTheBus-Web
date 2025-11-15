@@ -22,7 +22,7 @@ const translations: Translations = {
         // Directions
         "direction.toDKU": "단국대학교 방향",
         "direction.toJukjeon": "죽전역 방향",
-        
+
         // Bus Labels
         "bus.shuttleToDKU": "셔틀버스(단국대학교 방향)",
         "bus.shuttleToJukjeon": "셔틀버스(죽전역 방향)",
@@ -55,7 +55,7 @@ const translations: Translations = {
         // Directions
         "direction.toDKU": "→ Dankook Univ.",
         "direction.toJukjeon": "→ Jukjeon Stn.",
-        
+
         // Bus Labels
         "bus.shuttleToDKU": "Shuttle Bus (→ Dankook Univ.)",
         "bus.shuttleToJukjeon": "Shuttle Bus (→ Jukjeon Stn.)",
@@ -108,11 +108,15 @@ export function LanguageProvider({
     };
 
     const formatBusNumber = (number: number): string => {
-        return language === "ko" ? `셔틀버스 ${number}` : `Shuttle Bus ${number}`;
+        return language === "ko"
+            ? `셔틀버스 ${number}`
+            : `Shuttle Bus ${number}`;
     };
 
     return (
-        <LanguageContext.Provider value={{ language, setLanguage, t, formatTime, formatBusNumber }}>
+        <LanguageContext.Provider
+            value={{ language, setLanguage, t, formatTime, formatBusNumber }}
+        >
             {children}
         </LanguageContext.Provider>
     );

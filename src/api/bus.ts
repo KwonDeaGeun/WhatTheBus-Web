@@ -4,9 +4,7 @@ import { apiGet } from "../lib/api";
 import { API_ENDPOINTS } from "../lib/endpoints";
 import { handleApiError } from "../lib/error";
 
-export const useBusLocations = (
-    onError?: (message: string) => void
-) => {
+export const useBusLocations = (onError?: (message: string) => void) => {
     return useQuery({
         queryKey: ["busLocations"],
         queryFn: async () => {
@@ -21,7 +19,7 @@ export const useBusLocations = (
                 return [];
             }
         },
-        refetchInterval: 5000,
+        refetchInterval: 7000,
         refetchIntervalInBackground: true,
         retry: 2,
     });
