@@ -14,8 +14,8 @@ const BUS_STOP_ICON_DIMENSIONS = {
     height: 56,
 } as const;
 
-const ANIMATION_DURATION = '0.3s';
-const ROTATION_EASING = 'ease-out';
+const ANIMATION_DURATION = "0.3s";
+const ROTATION_EASING = "ease-out";
 
 export interface OverlayHandle {
     setMap: (map: KakaoMap | null) => void;
@@ -23,14 +23,20 @@ export interface OverlayHandle {
 }
 
 // 버스 ID별 이전 위치와 회전 값을 저장
-const previousBusPositions = new Map<string, { lat: number; lng: number; rotation: number }>();
+const previousBusPositions = new Map<
+    string,
+    { lat: number; lng: number; rotation: number }
+>();
 
 // 버스 ID별 오버레이와 DOM 요소를 캐시
-const busOverlayCache = new Map<string, { 
-    overlay: KakaoOverlay; 
-    img: HTMLImageElement;
-    div: HTMLDivElement;
-}>();
+const busOverlayCache = new Map<
+    string,
+    {
+        overlay: KakaoOverlay;
+        img: HTMLImageElement;
+        div: HTMLDivElement;
+    }
+>();
 
 // 모든 버스 오버레이 정리 (페이지 이동 시 호출)
 export const clearAllBusOverlays = () => {
@@ -50,14 +56,14 @@ const calculateAngle = (
 ): number => {
     const deltaLat = currLat - prevLat;
     const deltaLng = currLng - prevLng;
-    
+
     // atan2를 사용하여 각도 계산 (라디안)
     // atan2(y, x)는 x축 기준 각도를 반환하므로, 북쪽 기준으로 변환
     const angleRad = Math.atan2(deltaLng, deltaLat);
-    
+
     // 라디안을 도(degree)로 변환
     const angleDeg = angleRad * (180 / Math.PI);
-    
+
     return angleDeg;
 };
 
@@ -65,17 +71,17 @@ const calculateAngle = (
 const normalizeRotation = (newAngle: number, prevAngle: number): number => {
     // 이전 각도를 0 ~ 360 범위로 정규화
     const normalizedPrev = ((prevAngle % 360) + 360) % 360;
-    
+
     // 새 각도도 0 ~ 360 범위로 정규화
     const normalizedNew = ((newAngle % 360) + 360) % 360;
-    
+
     // 각도 차이 계산
     let diff = normalizedNew - normalizedPrev;
-    
+
     // 최단 경로로 차이 조정
     if (diff > 180) diff -= 360;
     if (diff < -180) diff += 360;
-    
+
     // 정규화된 이전 각도에서 최단 거리만큼 회전 후 0~360 범위로
     const result = normalizedPrev + diff;
     return ((result % 360) + 360) % 360;
@@ -264,7 +270,9 @@ export const createBusStopOverlays = (
         // Return overlay with cleanup method
         return {
             setMap: (m: unknown) => {
-                (overlay as unknown as { setMap: (m: unknown) => void }).setMap(m);
+                (overlay as unknown as { setMap: (m: unknown) => void }).setMap(
+                    m
+                );
             },
             cleanup: () => {
                 busIconDiv.removeEventListener("click", handleClick);
@@ -281,8 +289,10 @@ export const createBusOverlays = (
     if (!map || typeof window === "undefined" || !window.kakao?.maps) return [];
 
     // 현재 활성 버스 ID 집합
-    const activeBusIds = new Set(buses.map(bus => bus.shuttleId || `${bus.lat}-${bus.lng}`));
-    
+    const activeBusIds = new Set(
+        buses.map((bus) => bus.shuttleId || `${bus.lat}-${bus.lng}`)
+    );
+
     // 비활성 버스 ID를 캐시와 previousBusPositions에서 제거 (메모리 누수 방지)
     for (const busId of busOverlayCache.keys()) {
         if (!activeBusIds.has(busId)) {
@@ -298,11 +308,11 @@ export const createBusOverlays = (
     return buses.map((bus) => {
         const busId = bus.shuttleId || `${bus.lat}-${bus.lng}`;
         const currentPosition = { lat: bus.lat, lng: bus.lng };
-        
+
         // 이전 위치가 있으면 각도 계산
         let rotation = 0;
         const previousData = previousBusPositions.get(busId);
-        
+
         if (previousData) {
             // 이전 위치와 현재 위치가 다른 경우에만 각도 계산
             if (
@@ -320,27 +330,27 @@ export const createBusOverlays = (
             } else {
                 // 위치가 변경되지 않았으면 이전 회전 값 재사용
                 rotation = previousData.rotation;
-            } 
+            }
         }
-        
+
         // 현재 위치와 회전 값을 저장
-        previousBusPositions.set(busId, { 
-            lat: currentPosition.lat, 
-            lng: currentPosition.lng, 
-            rotation 
+        previousBusPositions.set(busId, {
+            lat: currentPosition.lat,
+            lng: currentPosition.lng,
+            rotation,
         });
 
         // 캐시된 오버레이가 있으면 재사용
         let cached = busOverlayCache.get(busId);
-        
+
         if (cached) {
             // 기존 오버레이 업데이트
             const busPosition = new window.kakao.maps.LatLng(bus.lat, bus.lng);
             cached.overlay.setPosition(busPosition);
-            
+
             // map 인스턴스가 변경되었을 수 있으므로 항상 setMap 호출
             cached.overlay.setMap(map);
-            
+
             // 회전 업데이트 (CSS transition이 적용됨)
             cached.img.style.transform = `rotate(${rotation}deg)`;
         } else {

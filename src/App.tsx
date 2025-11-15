@@ -39,9 +39,10 @@ function App() {
     const langId = useId();
     const [language, setLanguage] = useState<Language>(() => {
         try {
-            const stored = typeof window !== "undefined" && window.localStorage
-                ? localStorage.getItem("wtb:lang")
-                : null;
+            const stored =
+                typeof window !== "undefined" && window.localStorage
+                    ? localStorage.getItem("wtb:lang")
+                    : null;
             return stored === "en" ? "en" : "ko";
         } catch {
             return "ko";
@@ -67,10 +68,7 @@ function App() {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <LanguageProvider
-                language={language}
-                setLanguage={setLanguage}
-            >
+            <LanguageProvider language={language} setLanguage={setLanguage}>
                 <ToastProvider>
                     <AppContent
                         mapId={mapId}
@@ -119,21 +117,24 @@ function AppContent({
     const { toast } = useToast();
     const errorShownRef = useRef(false);
 
-    const handleBusLocationError = useCallback((message: string) => {
-        // Only show toast once to avoid spamming on refetch failures
-        if (!errorShownRef.current) {
-            toast({
-                title: "버스 위치 조회 오류",
-                description: message,
-                variant: "destructive",
-            });
-            errorShownRef.current = true;
-            // Reset after 30 seconds to allow showing error again if it persists
-            setTimeout(() => {
-                errorShownRef.current = false;
-            }, 30000);
-        }
-    }, [toast]);
+    const handleBusLocationError = useCallback(
+        (message: string) => {
+            // Only show toast once to avoid spamming on refetch failures
+            if (!errorShownRef.current) {
+                toast({
+                    title: "버스 위치 조회 오류",
+                    description: message,
+                    variant: "destructive",
+                });
+                errorShownRef.current = true;
+                // Reset after 30 seconds to allow showing error again if it persists
+                setTimeout(() => {
+                    errorShownRef.current = false;
+                }, 30000);
+            }
+        },
+        [toast]
+    );
 
     const { data: buses = [] } = useBusLocations(handleBusLocationError);
     const handleBusNumberSelect = useBusSelection(buses, setBubbleStop);
@@ -167,8 +168,8 @@ function AppContent({
                     />
                 </Suspense>
             ) : null}
-            <MapContainer 
-                mapId={mapId} 
+            <MapContainer
+                mapId={mapId}
                 selectedStopName={bubbleStop?.name}
                 onStopClick={handleStopClick}
             >

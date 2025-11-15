@@ -83,7 +83,9 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                     <select
                         id={langId}
                         value={language}
-                        onChange={(e) => setLanguage(e.target.value as Language)}
+                        onChange={(e) =>
+                            setLanguage(e.target.value as Language)
+                        }
                         style={{
                             padding: 8,
                             borderRadius: 6,

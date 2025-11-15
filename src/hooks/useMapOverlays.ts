@@ -19,7 +19,12 @@ export const useMapOverlays = (
     useEffect(() => {
         if (!map) return;
 
-        const stopOverlays = createBusStopOverlays(map, busStops, selectedStopName, onStopClick);
+        const stopOverlays = createBusStopOverlays(
+            map,
+            busStops,
+            selectedStopName,
+            onStopClick
+        );
 
         return () => {
             stopOverlays.forEach((overlay) => {

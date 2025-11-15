@@ -22,7 +22,11 @@ export const useBusSelection = (
                             : bus.direction === false
                               ? "bus.shuttleToJukjeon"
                               : "bus.shuttle";
-                    setBubbleStop({ lat: bus.lat, lng: bus.lng, name: directionKey });
+                    setBubbleStop({
+                        lat: bus.lat,
+                        lng: bus.lng,
+                        name: directionKey,
+                    });
                 } catch {
                     /* ignore */
                 }
