@@ -323,6 +323,9 @@ export const createBusOverlays = (
             const busPosition = new window.kakao.maps.LatLng(bus.lat, bus.lng);
             (cached.overlay as { setPosition: (pos: unknown) => void }).setPosition?.(busPosition);
             
+            // map 인스턴스가 변경되었을 수 있으므로 항상 setMap 호출
+            (cached.overlay as { setMap: (m: unknown) => void }).setMap(map);
+            
             // 회전 업데이트 (CSS transition이 적용됨)
             cached.img.style.transform = `rotate(${rotation}deg)`;
         } else {
@@ -367,7 +370,11 @@ export const createBusOverlays = (
                 }
             },
             cleanup: () => {
-                // 오버레이 제거 시 캐시와 previousBusPositions에서도 제거
+                // 오버레이를 지도에서 제거
+                if (cached) {
+                    (cached.overlay as { setMap: (m: unknown) => void }).setMap(null);
+                }
+                // 캐시와 previousBusPositions에서도 제거
                 busOverlayCache.delete(busId);
                 previousBusPositions.delete(busId);
             },
