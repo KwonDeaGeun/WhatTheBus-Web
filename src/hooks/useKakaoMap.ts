@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { KakaoMap } from "../types/kakao";
 
 interface UseKakaoMapOptions {
     mapId: string;
@@ -10,7 +11,7 @@ interface UseKakaoMapOptions {
 }
 
 export const useKakaoMap = ({ mapId, toast }: UseKakaoMapOptions) => {
-    const [mapInstance, setMapInstance] = useState<unknown>(null);
+    const [mapInstance, setMapInstance] = useState<KakaoMap | null>(null);
 
     useEffect(() => {
         const kakaoApiKey = import.meta.env.VITE_KAKAO_MAP_API_KEY;
