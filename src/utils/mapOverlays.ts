@@ -7,8 +7,8 @@ export interface OverlayHandle {
     cleanup?: () => void;
 }
 
-// 버스 ID별 이전 위치를 저장
-const previousBusPositions = new Map<string, { lat: number; lng: number }>();
+// 버스 ID별 이전 위치와 회전 값을 저장
+const previousBusPositions = new Map<string, { lat: number; lng: number; rotation: number }>();
 
 // 두 좌표 사이의 각도 계산 (북쪽 기준, 시계방향)
 const calculateAngle = (
@@ -229,30 +229,47 @@ export const createBusOverlays = (
 ): OverlayHandle[] => {
     if (!map || typeof window === "undefined" || !window.kakao?.maps) return [];
 
+    // 현재 활성 버스 ID 집합
+    const activeBusIds = new Set(buses.map(bus => bus.shuttleId || `${bus.lat}-${bus.lng}`));
+    
+    // 비활성 버스 ID를 previousBusPositions에서 제거 (메모리 누수 방지)
+    for (const busId of previousBusPositions.keys()) {
+        if (!activeBusIds.has(busId)) {
+            previousBusPositions.delete(busId);
+        }
+    }
+
     return buses.map((bus) => {
         const busId = bus.shuttleId || `${bus.lat}-${bus.lng}`;
         const currentPosition = { lat: bus.lat, lng: bus.lng };
         
         // 이전 위치가 있으면 각도 계산
         let rotation = 0;
-        const previousPosition = previousBusPositions.get(busId);
-        if (previousPosition) {
+        const previousData = previousBusPositions.get(busId);
+        if (previousData) {
             // 이전 위치와 현재 위치가 다른 경우에만 각도 계산
             if (
-                previousPosition.lat !== currentPosition.lat ||
-                previousPosition.lng !== currentPosition.lng
+                previousData.lat !== currentPosition.lat ||
+                previousData.lng !== currentPosition.lng
             ) {
                 rotation = calculateAngle(
-                    previousPosition.lat,
-                    previousPosition.lng,
+                    previousData.lat,
+                    previousData.lng,
                     currentPosition.lat,
                     currentPosition.lng
                 );
+            } else {
+                // 위치가 변경되지 않았으면 이전 회전 값 재사용
+                rotation = previousData.rotation;
             }
         }
         
-        // 현재 위치를 이전 위치로 저장
-        previousBusPositions.set(busId, currentPosition);
+        // 현재 위치와 회전 값을 저장
+        previousBusPositions.set(busId, { 
+            lat: currentPosition.lat, 
+            lng: currentPosition.lng, 
+            rotation 
+        });
 
         const busDiv = document.createElement("div");
         busDiv.style.width = "18px";
@@ -283,6 +300,14 @@ export const createBusOverlays = (
         });
         (busOverlay as unknown as { setMap: (m: unknown) => void }).setMap(map);
 
-        return busOverlay as OverlayHandle;
+        return {
+            setMap: (m: unknown) => {
+                (busOverlay as unknown as { setMap: (m: unknown) => void }).setMap(m);
+            },
+            cleanup: () => {
+                // 오버레이 제거 시 previousBusPositions에서도 제거
+                previousBusPositions.delete(busId);
+            },
+        };
     });
 };
