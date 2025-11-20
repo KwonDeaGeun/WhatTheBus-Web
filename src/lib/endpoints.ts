@@ -4,6 +4,6 @@ export const API_ENDPOINTS = {
         LOCATIONS: "api/shuttle/locations",
     },
     BUS: {
-        ARRIVALS: "api/bus/arrivals"
-    }
+        ARRIVALS: "api/bus/arrivals",
+    },
 } as const;
