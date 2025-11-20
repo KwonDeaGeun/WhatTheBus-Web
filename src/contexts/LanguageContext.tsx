@@ -41,6 +41,8 @@ const translations: Translations = {
         "common.loading": "로딩 중...",
         "common.error": "오류가 발생했습니다",
         "common.noData": "데이터가 없습니다",
+        "common.noArrival": "도착 정보 없음",
+        "common.arrivingSoon": "곧 도착",
     },
     en: {
         // BusStops
@@ -75,6 +77,8 @@ const translations: Translations = {
         "common.loading": "Loading...",
         "common.error": "An error occurred",
         "common.noData": "No data available",
+        "common.noArrival": "No arrival info",
+        "common.arrivingSoon": "Arriving soon",
     },
 };
 

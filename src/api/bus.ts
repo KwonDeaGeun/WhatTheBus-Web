@@ -24,3 +24,42 @@ export const useBusLocations = (onError?: (message: string) => void) => {
         retry: 2,
     });
 };
+
+// Types for arrivals API
+export interface ArrivalBus {
+    routeName: string;
+    minutesLeft: number | null;
+    remainingSeats: number | null;
+}
+
+export interface ArrivalStop {
+    stopCode: string;
+    stopName: string;
+    buses: ArrivalBus[];
+}
+
+export interface ArrivalsResponse {
+    updatedAt: string;
+    stops: ArrivalStop[];
+}
+
+export const useBusArrivals = (onError?: (message: string) => void) => {
+    return useQuery({
+        queryKey: ["busArrivals"],
+        queryFn: async (): Promise<ArrivalsResponse | null> => {
+            try {
+                const data = await apiGet<ArrivalsResponse>(
+                    API_ENDPOINTS.BUS.ARRIVALS
+                );
+                return data || null;
+            } catch (error) {
+                const errorMessage = await handleApiError(error);
+                if (onError) onError(errorMessage);
+                return null;
+            }
+        },
+        refetchInterval: 7000,
+        refetchIntervalInBackground: true,
+        retry: 2,
+    });
+};

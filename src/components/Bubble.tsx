@@ -2,6 +2,7 @@ import { BusFront, X } from "lucide-react";
 import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { useTranslation } from "../contexts/LanguageContext";
+import { useBusArrivals } from "../api/bus";
 
 const DISPLAY_NAME_MAP: Record<string, string> = {
     죽전역: "죽전역(단국대학교 방향)",
@@ -19,6 +20,7 @@ type Props = {
 
 export default function Bubble({ stop, onClose }: Props) {
     const { t, formatTime } = useTranslation();
+    const { data: arrivals } = useBusArrivals();
     useEffect(() => {
         if (typeof window.kakao === "undefined" || !window.map) return;
 
@@ -86,9 +88,12 @@ export default function Bubble({ stop, onClose }: Props) {
                         }
                     }
 
-                    // Pre-calculate time labels
-                    const time1Label = formatTime(5);
-                    const time2Label = formatTime(15);
+
+                    // Find arrival info for this stop (match by substring)
+                    const arrivalStop =
+                        arrivals?.stops?.find((s) =>
+                            String(s.stopName).includes(rawName)
+                        ) || null;
 
                     const root = createRoot(el);
                     root.render(
@@ -140,67 +145,70 @@ export default function Bubble({ stop, onClose }: Props) {
                                         pointerEvents: "none",
                                     }}
                                 />
-                                <div style={{ fontWeight: 600 }}>
+                                    <div style={{ fontWeight: 600 }}>
                                     {displayName}
                                 </div>
                                 {!rawName.startsWith("bus.") && (
                                     <>
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: "8px",
-                                                marginTop: "8px",
-                                                fontWeight: 400,
-                                                fontSize: "16px",
-                                            }}
-                                        >
-                                            <BusFront
-                                                size={16}
-                                                color="#f6c341"
-                                            />
-                                            <span>
-                                                <span
-                                                    style={{
-                                                        color: "#f6c341",
-                                                        fontWeight: 700,
-                                                    }}
-                                                >
-                                                    24
-                                                </span>
-                                                <span style={{ marginLeft: 8 }}>
-                                                    | {time1Label}
-                                                </span>
-                                            </span>
-                                        </div>
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: "8px",
-                                                marginTop: "6px",
-                                                fontWeight: 400,
-                                                fontSize: "16px",
-                                            }}
-                                        >
-                                            <BusFront
-                                                size={16}
-                                                color="#7dd3fc"
-                                            />
-                                            <span>
-                                                <span
-                                                    style={{
-                                                        color: "#7dd3fc",
-                                                        fontWeight: 700,
-                                                    }}
-                                                >
-                                                    720-3
-                                                </span>
-                                                <span style={{ marginLeft: 8 }}>
-                                                    | {time2Label}
-                                                </span>
-                                            </span>
-                                        </div>
+                                        {(arrivalStop?.buses ?? []).length === 0 && (
+                                            <div
+                                                style={{
+                                                    marginTop: "8px",
+                                                    fontSize: "16px",
+                                                    color: "#666",
+                                                }}
+                                            >
+                                                {t("common.noData")}
+                                            </div>
+                                        )}
+
+                                        {(arrivalStop?.buses ?? []).map((b, idx) => {
+                                                const route = String(b.routeName || "");
+                                                const color =
+                                                    route === "24"
+                                                        ? "#f6c341"
+                                                        : route === "720-3"
+                                                        ? "#7dd3fc"
+                                                        : "#000000";
+                                                let timeLabel: string;
+                                                if (b.minutesLeft === null) {
+                                                    timeLabel = t("common.noArrival");
+                                                } else if (b.minutesLeft === 1) {
+                                                    timeLabel = t("common.arrivingSoon");
+                                                } else {
+                                                    timeLabel = formatTime(b.minutesLeft);
+                                                }
+
+                                                return (
+                                                    <div
+                                                        key={`${b.routeName}-${idx}`}
+                                                        style={{
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            gap: "8px",
+                                                            marginTop: idx === 0 ? "8px" : "6px",
+                                                            fontWeight: 400,
+                                                            fontSize: "16px",
+                                                        }}
+                                                    >
+                                                        <BusFront size={16} color={color} />
+                                                        <span>
+                                                            <span
+                                                                style={{
+                                                                    color,
+                                                                    fontWeight: 700,
+                                                                }}
+                                                            >
+                                                                {b.routeName}
+                                                            </span>
+                                                            <span style={{ marginLeft: 8 }}>
+                                                                | {timeLabel}
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                );
+                                            }
+                                        )}
                                     </>
                                 )}
                             </button>
@@ -258,7 +266,7 @@ export default function Bubble({ stop, onClose }: Props) {
             window.__currentBubbleOverlay = undefined;
             window.__currentBubbleStopName = undefined;
         };
-    }, [stop, onClose, t, formatTime]);
+    }, [stop, onClose, t, formatTime, arrivals]);
 
     return null;
 }
