@@ -7,6 +7,7 @@ const DISPLAY_NAME_MAP: Record<string, string> = {
     죽전역: "죽전역(단국대학교 방향)",
     치과병원: "치과병원(단국대학교 방향)",
     정문: "정문(죽전역 방향)",
+    인문관: "인문관(죽전역 방향)"
 };
 
 type Stop = { lat: number; lng: number; name: string };
