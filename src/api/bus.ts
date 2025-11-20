@@ -1,15 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import type { Bus } from "../data/bus";
 import { apiGet } from "../lib/api";
 import { API_ENDPOINTS } from "../lib/endpoints";
 import { handleApiError } from "../lib/error";
+import type { ArrivalsResponse, Shuttle } from "../types/bus";
 
 export const useBusLocations = (onError?: (message: string) => void) => {
     return useQuery({
         queryKey: ["busLocations"],
         queryFn: async () => {
             try {
-                const data = await apiGet<Bus[]>(
+                const data = await apiGet<Shuttle[]>(
                     API_ENDPOINTS.SHUTTLE.LOCATIONS
                 );
                 return Array.isArray(data) ? data : [];
@@ -28,22 +28,6 @@ export const useBusLocations = (onError?: (message: string) => void) => {
 };
 
 // Types for arrivals API
-export interface ArrivalBus {
-    routeName: string;
-    minutesLeft: number | null;
-    remainingSeats: number | null;
-}
-
-export interface ArrivalStop {
-    stopCode: string;
-    stopName: string;
-    buses: ArrivalBus[];
-}
-
-export interface ArrivalsResponse {
-    updatedAt: string;
-    stops: ArrivalStop[];
-}
 
 export const useBusArrivals = (onError?: (message: string) => void) => {
     return useQuery({

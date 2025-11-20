@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import type { Bus } from "../data/bus";
 import type { BusStop } from "../data/busStops";
+import type { Shuttle } from "../types/bus";
 import type { KakaoMap } from "../types/kakao";
 import {
     clearAllBusOverlays,
@@ -11,7 +11,7 @@ import {
 export const useMapOverlays = (
     map: KakaoMap | null,
     busStops: BusStop[],
-    buses: Bus[],
+    buses: Shuttle[],
     selectedStopName?: string,
     onStopClick?: (stop: BusStop) => void
 ) => {

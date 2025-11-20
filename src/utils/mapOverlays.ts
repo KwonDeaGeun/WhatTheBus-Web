@@ -1,6 +1,6 @@
 import busIconSvg from "../assets/busIcon.svg";
-import type { Bus } from "../data/bus";
 import type { BusStop } from "../data/busStops";
+import type { Shuttle } from "../types/bus";
 import type { KakaoMap, KakaoOverlay } from "../types/kakao";
 
 // 상수 정의
@@ -284,7 +284,7 @@ export const createBusStopOverlays = (
 
 export const createBusOverlays = (
     map: KakaoMap,
-    buses: Bus[]
+    buses: Shuttle[]
 ): OverlayHandle[] => {
     if (!map || typeof window === "undefined" || !window.kakao?.maps) return [];
 
