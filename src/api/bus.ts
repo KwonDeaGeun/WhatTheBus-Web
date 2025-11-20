@@ -9,7 +9,7 @@ export const useBusLocations = (onError?: (message: string) => void) => {
         queryKey: ["busLocations"],
         queryFn: async () => {
             try {
-                const data = await apiGet<Bus[]>(API_ENDPOINTS.BUS.LOCATION);
+                const data = await apiGet<Bus[]>(API_ENDPOINTS.SHUTTLE.LOCATIONS);
                 return Array.isArray(data) ? data : [];
             } catch (error) {
                 const errorMessage = await handleApiError(error);
