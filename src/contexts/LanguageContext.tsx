@@ -17,6 +17,7 @@ const translations: Translations = {
         "busStop.평화의광장": "평화의광장",
         "busStop.치과병원": "치과병원",
         "busStop.정문": "정문",
+        "busStop.인문관": "인문관",
         "busStop.죽전역": "죽전역",
 
         // Directions
@@ -40,6 +41,8 @@ const translations: Translations = {
         "common.loading": "로딩 중...",
         "common.error": "오류가 발생했습니다",
         "common.noData": "데이터가 없습니다",
+        "common.noArrival": "도착 정보 없음",
+        "common.arrivingSoon": "곧 도착",
     },
     en: {
         // BusStops
@@ -50,6 +53,7 @@ const translations: Translations = {
         "busStop.평화의광장": "Dankook Univ. Peace Square",
         "busStop.치과병원": "Dankook Univ. Dental Hospital",
         "busStop.정문": "Dankook Univ. Main Gate",
+        "busStop.인문관": "Humanities Building",
         "busStop.죽전역": "Jukjeon Stn/ Shinsegae S. City",
 
         // Directions
@@ -73,6 +77,8 @@ const translations: Translations = {
         "common.loading": "Loading...",
         "common.error": "An error occurred",
         "common.noData": "No data available",
+        "common.noArrival": "No arrival info",
+        "common.arrivingSoon": "Arriving soon",
     },
 };
 

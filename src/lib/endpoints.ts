@@ -1,6 +1,9 @@
 export const API_ENDPOINTS = {
-    // 시내 버스 관련
+    // 셔틀 버스 관련
+    SHUTTLE: {
+        LOCATIONS: "api/shuttle/locations",
+    },
     BUS: {
-        LOCATION: "api/shuttle/locations",
+        ARRIVALS: "api/bus/arrivals",
     },
 } as const;
