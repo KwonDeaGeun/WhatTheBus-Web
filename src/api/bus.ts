@@ -44,7 +44,7 @@ export const useBusArrivals = (onError?: (message: string) => void) => {
                 return null;
             }
         },
-        refetchInterval: 30000,
+        refetchInterval: 20000,
         refetchIntervalInBackground: true,
         retry: 2,
     });
