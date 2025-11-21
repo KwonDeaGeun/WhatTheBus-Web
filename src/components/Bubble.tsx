@@ -149,18 +149,36 @@ export default function Bubble({ stop, onClose }: Props) {
                                 </div>
                                 {!rawName.startsWith("bus.") && (
                                     <>
-                                        {(arrivalStop?.buses ?? []).length ===
-                                            0 && (
-                                            <div
-                                                style={{
-                                                    marginTop: "8px",
-                                                    fontSize: "16px",
-                                                    color: "#666",
-                                                }}
-                                            >
-                                                {t("common.noData")}
-                                            </div>
-                                        )}
+                                        {(() => {
+                                            const buses = arrivalStop?.buses ?? [];
+                                            if (rawName === "평화의광장") {
+                                                return (
+                                                    <div
+                                                        style={{
+                                                            marginTop: "8px",
+                                                            fontSize: "16px",
+                                                            color: "#666",
+                                                        }}
+                                                    >
+                                                        {t("common.startPoint")}
+                                                    </div>
+                                                );
+                                            }
+                                            if (buses.length === 0) {
+                                                return (
+                                                    <div
+                                                        style={{
+                                                            marginTop: "8px",
+                                                            fontSize: "16px",
+                                                            color: "#666",
+                                                        }}
+                                                    >
+                                                        {t("common.noData")}
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        })()}
 
                                         {(arrivalStop?.buses ?? []).map(
                                             (b, idx) => {

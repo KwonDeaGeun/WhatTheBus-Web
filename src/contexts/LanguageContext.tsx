@@ -43,6 +43,7 @@ const translations: Translations = {
         "common.noData": "데이터가 없습니다",
         "common.noArrival": "도착 정보 없음",
         "common.arrivingSoon": "곧 도착",
+        "common.startPoint": "출발지"
     },
     en: {
         // BusStops
@@ -79,6 +80,7 @@ const translations: Translations = {
         "common.noData": "No data available",
         "common.noArrival": "No arrival info",
         "common.arrivingSoon": "Arriving soon",
+        "common.startPoint": "Start Point"
     },
 };
 
