@@ -81,9 +81,9 @@ export default function Bubble({ stop, onClose }: Props) {
                         if (DISPLAY_NAME_MAP[rawName]) {
                             const directionKey = DISPLAY_NAME_MAP[
                                 rawName
-                            ].includes("죽전역")
-                                ? "direction.toJukjeon"
-                                : "direction.toDKU";
+                            ].includes("단국대학교")
+                                ? "direction.toDKU"
+                                : "direction.toJukjeon";
                             displayName = `${displayBaseName} (${t(directionKey)})`;
                         }
                     }
