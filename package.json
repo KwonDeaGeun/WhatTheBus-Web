@@ -20,10 +20,12 @@
         "clsx": "^2.1.1",
         "ky": "^1.10.0",
         "lucide-react": "^0.508.0",
-        "react": "^19.1.0",
-        "react-dom": "^19.1.0",
+        "react": "^19.2.1",
+        "react-dom": "^19.2.1",
         "react-kakao-maps": "^0.0.13",
         "react-kakao-maps-sdk": "^1.2.0",
+        "react-server-dom-parcel": "^19.2.1",
+        "react-server-dom-webpack": "^19.2.1",
         "tailwind-merge": "^3.2.0"
     },
     "devDependencies": {
